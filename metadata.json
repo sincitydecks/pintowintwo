@@ -1,0 +1,6 @@
+{
+  "name": "RFDS Scrambler - Pin to Win",
+  "description": "RFDS Flight Crew Challenge game for the National Rural Health Alliance Conference",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
