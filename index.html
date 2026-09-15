@@ -4305,6 +4305,65 @@ body.rfds-story-lock {
     animation-delay: 0.1s;
   }
 }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin-anim {
+  animation: spin 1s linear infinite;
+}
+/* Spatial Slide Form Pattern */
+.slide-track {
+  display: flex;
+  width: 200%;
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  align-items: flex-start;
+}
+.slide-track.active {
+  transform: translateX(-50%);
+}
+.slide-panel {
+  width: 50%;
+  flex-shrink: 0;
+  /* Add some extra padding to bottom for scrolling comfort on mobile */
+  padding-bottom: 32px; 
+}
+
+.spatial-cta-btn {
+  width: 100%;
+  height: 56px;
+  border-radius: 16px;
+  background: #f05b22;
+  color: white;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s, background 0.2s;
+  margin-top: 16px;
+}
+.spatial-cta-btn:active {
+  transform: scale(0.98);
+}
+.spatial-cta-btn:hover {
+  background: #d04a1a;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.back-link:hover {
+  color: #0f172a;
+}
 </style>
 
 </head>
@@ -4753,23 +4812,28 @@ body.rfds-story-lock {
       <!-- Consolidated Single-Face Profile Card -->
       <div class="flip-card-front eoi-form-face" id="profileCardFace">
         <button type="button" class="modal-close-btn" id="modalCloseBtnFront" aria-label="Close profile">&times;</button>
-
-        <span class="section-meta-kicker" id="formSectionLabel">RFDS · SA/NT</span>
         
-        <!-- Regional blurb header banner -->
-        <div class="profile-card-overview">
-          <span class="profile-card-title" id="selectionSectionLabel">RFDS SA/NT</span>
-          <p class="profile-card-blurb" id="successSectionBlurb">We’re a lifeline for South Australians and Territorians, delivering emergency aeromedical and essential primary health care.</p>
-        </div>
+        <div class="slide-viewport" style="width: 100%; overflow-x: hidden; flex: 0 0 auto;">
+          <div class="slide-track" id="eoiSlideTrack">
+            <!-- Slide 1: Blurb -->
+          <div class="slide-panel">
+            <span class="section-meta-kicker" id="formSectionLabel">RFDS · SA/NT</span>
+            <div class="profile-card-overview" style="margin-bottom: 32px;">
+              <span class="profile-card-title" id="selectionSectionLabel" style="font-size: 28px; line-height: 1.1; margin-bottom: 16px; display: block;">RFDS SA/NT</span>
+              <p class="profile-card-blurb" id="successSectionBlurb" style="font-size: 16px; line-height: 1.6; color: #475569;">We’re a lifeline for South Australians and Territorians, delivering emergency aeromedical and essential primary health care.</p>
+            </div>
+            <button type="button" class="spatial-cta-btn" id="spatialGoFurtherBtn">Go further in SA/NT &rarr;</button>
+          </div>
 
-        <div class="profile-card-divider">
-          <span>Join our talent community</span>
-        </div>
+          <!-- Slide 2: Form & Success -->
+          <div class="slide-panel">
+            <div class="back-link" id="spatialBackBtn" style="margin-bottom: 16px;">&larr; Back to SA/NT</div>
+            <div class="profile-card-divider" style="margin-bottom: 16px;">
+              <span>Join our talent community</span>
+            </div>
 
-        <p class="eoi-form-subheading">Express your interest in an RFDS career below</p>
-
-        <form id="eoiForm" onsubmit="return false;">
-          <input type="hidden" id="eoiSelectedSection" value="SA / NT" />
+            <form id="eoiForm" onsubmit="return false;">
+              <input type="hidden" id="eoiSelectedSection" value="SA / NT" />
 
           <div id="eoiInputsGroup">
             <div class="form-row">
@@ -4868,6 +4932,9 @@ body.rfds-story-lock {
             </div>
           </div>
         </form>
+          </div>
+        </div>
+        </div>
       </div>
 
     </div>
@@ -4879,6 +4946,7 @@ body.rfds-story-lock {
 var STATE_DATA = {
   'WA': {
     name: 'Western Australia',
+    acronym: 'WA',
     formTitle: 'WESTERN OPERATIONS',
     section: 'Royal Flying Doctor Service',
     blurb: 'In WA, our team of medical clinicians and pilots are committed to providing the finest care to the furthest corner of the state. Together we provide fast, free and efficient emergency retrievals, GP health clinics, dentistry, telehealth and medical chests.',
@@ -4894,6 +4962,7 @@ var STATE_DATA = {
   },
   'SA_NT': {
     name: 'SA / NT',
+    acronym: 'SA/NT',
     formTitle: 'SA/NT',
     section: 'Royal Flying Doctor Service',
     blurb: 'We’re a lifeline for South Australians and Territorians, delivering emergency aeromedical and essential primary health care. From life-saving evacuations to fly-in clinics and digital health solutions, the organisation brings essential care to the most isolated corners of the country.',
@@ -4909,6 +4978,7 @@ var STATE_DATA = {
   },
   'QLD': {
     name: 'Queensland',
+    acronym: 'QLD',
     formTitle: 'QUEENSLAND SECTION',
     section: 'Royal Flying Doctor Service',
     blurb: 'In Queensland, we provide excellence in, and access to primary health care and aeromedical services across the state. In addition to aeromedical retrievals of the critically ill or injured, we deliver a broad range of essential primary and preventative healthcare services, including telehealth, mental health, oral health and health promotion.',
@@ -4924,6 +4994,7 @@ var STATE_DATA = {
   },
   'NSW': {
     name: 'New South Wales',
+    acronym: 'NSW/ACT',
     formTitle: 'SOUTH EASTERN SECTION',
     section: 'Royal Flying Doctor Service',
     blurb: 'In NSW/ACT, we provide life-saving outback emergency aeromedical retrievals and hospital transfers, as well as on-the-ground GP and nurse appointments, dental care, mental health care, alcohol and other drug counselling, vaccinations, chronic disease management and telehealth.',
@@ -4939,6 +5010,7 @@ var STATE_DATA = {
   },
   'VIC': {
     name: 'Victoria',
+    acronym: 'VIC',
     formTitle: 'VICTORIA SECTION',
     section: 'Royal Flying Doctor Service',
     blurb: 'In Victoria, we work in partnership with a number of community health organisations across the state to improve the health and wellbeing of our rural communities. From non-emergency patient transports by air and by road to primary health services reaching the furthest corners of our state, we ensure that great health care is accessible to all, no matter where you live.',
@@ -4953,6 +5025,7 @@ var STATE_DATA = {
   },
   'TAS': {
     name: 'Tasmania',
+    acronym: 'TAS',
     formTitle: 'TASMANIA',
     section: 'Royal Flying Doctor Service',
     blurb: 'In Tasmania, we deliver aeromedical care in partnership with Ambulance Tasmania, as well as dental and primary health services across the state, supporting communities where care is needed most. Our teams work across Tasmania, including its islands, providing essential care, outreach and education to make a lasting difference.',
@@ -5690,7 +5763,7 @@ function openModal(id) {
   if (eoiCapturedPanel) eoiCapturedPanel.style.display = 'none';
   if (eoiSubmitBtn) {
     eoiSubmitBtn.disabled = false;
-    eoiSubmitBtn.innerHTML = '<span>Join our talent community</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+    eoiSubmitBtn.innerHTML = '<span>EXPRESS YOUR INTEREST</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
   }
   var profileCardFace = document.getElementById('profileCardFace');
   if (profileCardFace) {
@@ -5703,6 +5776,15 @@ function openModal(id) {
   var selectionSectionLabel = document.getElementById('selectionSectionLabel');
   if (selectionSectionLabel) selectionSectionLabel.textContent = 'RFDS ' + data.formTitle;
   if (successSectionBlurb) successSectionBlurb.textContent = data.blurb;
+  
+  var spatialGoFurtherBtn = document.getElementById('spatialGoFurtherBtn');
+  if (spatialGoFurtherBtn) spatialGoFurtherBtn.innerHTML = 'Go further in ' + (data.acronym || data.formTitle) + ' &rarr;';
+  
+  var spatialBackBtn = document.getElementById('spatialBackBtn');
+  if (spatialBackBtn) spatialBackBtn.innerHTML = '&larr; Back to ' + (data.acronym || data.formTitle);
+  
+  var eoiSlideTrack = document.getElementById('eoiSlideTrack');
+  if (eoiSlideTrack) eoiSlideTrack.classList.remove('active');
 
   stateModal.classList.add('open');
   document.getElementById('rfds-app').classList.add('drawer-open');
@@ -5818,6 +5900,22 @@ document.querySelectorAll('.state-path').forEach(function(path) {
   path.addEventListener('pointercancel', clearStateTouchFeedback, { passive: true });
 });
 
+// Spatial Slide logic
+var spatialGoFurtherBtn = document.getElementById('spatialGoFurtherBtn');
+var spatialBackBtn = document.getElementById('spatialBackBtn');
+var eoiSlideTrack = document.getElementById('eoiSlideTrack');
+
+if (spatialGoFurtherBtn && eoiSlideTrack) {
+  spatialGoFurtherBtn.addEventListener('click', function() {
+    eoiSlideTrack.classList.add('active');
+  });
+}
+if (spatialBackBtn && eoiSlideTrack) {
+  spatialBackBtn.addEventListener('click', function() {
+    eoiSlideTrack.classList.remove('active');
+  });
+}
+
 // Form submission handler. After the section-selection step, the EOI form confirms receipt in-place.
 // Connect this point to your approved form/email endpoint when production delivery is available.
 var eoiForm = document.getElementById('eoiForm');
@@ -5858,8 +5956,7 @@ window.addEventListener('resize', function() {
 eoiForm.addEventListener('submit', async function(e) {
   e.preventDefault();
 
-  var firstName = document.getElementById('eoiFirstName').value.trim();
-  var lastName = document.getElementById('eoiLastName').value.trim();
+  var fullName = document.getElementById('eoiFullName').value.trim();
   var email = document.getElementById('eoiEmail').value.trim();
   var phone = document.getElementById('eoiPhone') ? document.getElementById('eoiPhone').value.trim() : '';
   var role = eoiRoleSelect.value;
@@ -5867,7 +5964,7 @@ eoiForm.addEventListener('submit', async function(e) {
   var formEmailTo = stateInfo.formEmailTo || 'stories@flyingdoctor.net';
   var sectionName = eoiSelectedSection ? eoiSelectedSection.value : stateInfo.formTitle;
 
-  if (!firstName || !lastName || !email || email.indexOf('@') === -1 || !role) {
+  if (!fullName || !email || email.indexOf('@') === -1 || !role) {
     formError.textContent = 'Please complete your name, email address and preferred role.';
     formError.style.display = 'block';
     return;
@@ -5883,82 +5980,16 @@ eoiForm.addEventListener('submit', async function(e) {
   var capRole = document.getElementById('capRole');
   var capSection = document.getElementById('capSection');
   var capRecipient = document.getElementById('capRecipient');
-  var capRecipientText = document.getElementById('capRecipientText');
-  var sendEoiBtn = document.getElementById('sendEoiBtn');
+  var eoiSubmitBtn = document.getElementById('eoiSubmitBtn');
   var editEoiBtn = document.getElementById('editEoiBtn');
 
-  // Populate captured information
-  if (capName) capName.textContent = firstName + ' ' + lastName;
-  if (capEmail) capEmail.textContent = email;
-  if (capPhone) capPhone.textContent = phone || 'Not provided';
-  if (capRole) capRole.textContent = role;
-  if (capSection) capSection.textContent = sectionName + ' (' + (stateInfo.name || currentActiveStateId) + ')';
-  if (capRecipient) capRecipient.textContent = formEmailTo;
-  if (capRecipientText) capRecipientText.textContent = formEmailTo;
-
-  // Build the mailto URI for their email client
-  function buildMailtoUrl(refId) {
-    var subject = encodeURIComponent('[RFDS Careers EOI] ' + role + ' - ' + firstName + ' ' + lastName);
-    var bodyLines = [
-      'Royal Flying Doctor Service — Expression of Interest',
-      '===================================================',
-      '',
-      'Dear RFDS Recruitment & Careers Team,',
-      '',
-      'I am submitting my Expression of Interest to join the Royal Flying Doctor Service with the following details:',
-      '',
-      '• Candidate: ' + firstName + ' ' + lastName,
-      '• Email: ' + email,
-      '• Contact Phone: ' + (phone || 'Not provided'),
-      '• Preferred Role: ' + role,
-      '• RFDS Section / State: ' + sectionName + ' (' + (stateInfo.name || currentActiveStateId) + ')',
-      '• Target Recipient: ' + formEmailTo,
-      (refId ? '• Application Ref: ' + refId : ''),
-      '',
-      'I look forward to discussing career and service opportunities with the Flying Doctor.',
-      '',
-      'Kind regards,',
-      firstName + ' ' + lastName,
-      email + (phone ? ' | ' + phone : '')
-    ].filter(function(line) { return line !== undefined; }).join('\n');
-
-    return 'mailto:' + formEmailTo + '?subject=' + subject + '&body=' + encodeURIComponent(bodyLines);
+  // Change button state to submitting
+  if (eoiSubmitBtn) {
+    eoiSubmitBtn.disabled = true;
+    eoiSubmitBtn.innerHTML = '<span>Submitting...</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-anim"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>';
   }
 
-  var currentMailtoUrl = buildMailtoUrl();
-
-  if (sendEoiBtn) {
-    sendEoiBtn.setAttribute('href', currentMailtoUrl);
-    sendEoiBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg><span>Send your EOI</span>';
-    
-    sendEoiBtn.onclick = function(evt) {
-      var targetUrl = sendEoiBtn.getAttribute('href') || currentMailtoUrl;
-      window.location.href = targetUrl;
-      sendEoiBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Email app opened · Ready to send</span>';
-    };
-  }
-
-  if (editEoiBtn) {
-    editEoiBtn.onclick = function() {
-      if (eoiCapturedPanel) eoiCapturedPanel.style.display = 'none';
-      if (eoiInputsGroup) eoiInputsGroup.style.display = 'block';
-      if (eoiSubmitBtn) {
-        eoiSubmitBtn.disabled = false;
-        eoiSubmitBtn.innerHTML = '<span>Review & re-populate EOI</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
-      }
-      if (typeof updateMobileFormCue === 'function') updateMobileFormCue();
-    };
-  }
-
-  // Display populated captured information card & hide inputs
-  if (eoiInputsGroup) eoiInputsGroup.style.display = 'none';
-  if (eoiCapturedPanel) {
-    eoiCapturedPanel.style.display = 'block';
-    eoiCapturedPanel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }
-  if (typeof updateMobileFormCue === 'function') updateMobileFormCue();
-
-  // Concurrently persist to server API (/api/eoi) to log the record and attempt direct SMTP dispatch
+  // Persist to server API (/api/eoi) directly
   try {
     fetch('/api/eoi', {
       method: 'POST',
@@ -5966,8 +5997,8 @@ eoiForm.addEventListener('submit', async function(e) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        firstName: firstName,
-        lastName: lastName,
+        firstName: fullName,
+        lastName: '',
         email: email,
         phone: phone,
         role: role,
@@ -5978,21 +6009,57 @@ eoiForm.addEventListener('submit', async function(e) {
     }).then(function(response) {
       return response.json();
     }).then(function(result) {
-      if (result && result.submissionId) {
-        var refreshedUrl = buildMailtoUrl(result.submissionId);
-        if (sendEoiBtn) {
-          sendEoiBtn.setAttribute('href', refreshedUrl);
-          sendEoiBtn.onclick = function() {
-            window.location.href = refreshedUrl;
-            sendEoiBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Email app opened · Ready to send</span>';
-          };
-        }
+      // Setup successful panel
+      if (capName) capName.textContent = fullName;
+      if (capEmail) capEmail.textContent = email;
+      if (capPhone) capPhone.textContent = phone || 'Not provided';
+      if (capRole) capRole.textContent = role;
+      if (capSection) capSection.textContent = sectionName + ' (' + (stateInfo.name || currentActiveStateId) + ')';
+      if (capRecipient) capRecipient.textContent = formEmailTo;
+      
+      if (editEoiBtn) {
+        editEoiBtn.onclick = function() {
+          if (eoiCapturedPanel) eoiCapturedPanel.style.display = 'none';
+          if (eoiInputsGroup) eoiInputsGroup.style.display = 'block';
+          if (eoiSubmitBtn) {
+            eoiSubmitBtn.disabled = false;
+            eoiSubmitBtn.innerHTML = '<span>EXPRESS YOUR INTEREST</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+          }
+          if (typeof updateMobileFormCue === 'function') updateMobileFormCue();
+          
+          // Clear form fields
+          document.getElementById('eoiFullName').value = '';
+          document.getElementById('eoiEmail').value = '';
+          if (document.getElementById('eoiPhone')) document.getElementById('eoiPhone').value = '';
+          eoiRoleSelect.value = '';
+        };
       }
+
+      // Display populated captured information card & hide inputs
+      if (eoiInputsGroup) eoiInputsGroup.style.display = 'none';
+      if (eoiCapturedPanel) {
+        eoiCapturedPanel.style.display = 'block';
+        eoiCapturedPanel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+      if (typeof updateMobileFormCue === 'function') updateMobileFormCue();
+
     }).catch(function(syncErr) {
       console.warn('Background sync note:', syncErr);
+      if (eoiSubmitBtn) {
+        eoiSubmitBtn.disabled = false;
+        eoiSubmitBtn.innerHTML = '<span>EXPRESS YOUR INTEREST</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+      }
+      formError.textContent = 'A network error occurred. Please try again.';
+      formError.style.display = 'block';
     });
   } catch (ex) {
     console.warn('API fetch attempt:', ex);
+    if (eoiSubmitBtn) {
+      eoiSubmitBtn.disabled = false;
+      eoiSubmitBtn.innerHTML = '<span>EXPRESS YOUR INTEREST</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+    }
+    formError.textContent = 'An unexpected error occurred. Please try again.';
+    formError.style.display = 'block';
   }
 });
 
