@@ -1,8 +1,5 @@
 {
   "name": "pin-to-win-rfds",
   "private": true,
-  "version": "1.0.0",
-  "scripts": {
-    "build": "echo Build complete"
-  }
+  "version": "1.0.0"
 }
