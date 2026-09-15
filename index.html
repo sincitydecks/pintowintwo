@@ -1039,7 +1039,7 @@ input, button, select, textarea {
       <p>Enter your name to appear on our leaderboard.</p>
       <div class="modal-grid">
         <div class="form-field full"><label for="player-name">Full Name</label><input id="player-name" maxlength="80" autocomplete="name" placeholder="Full Name"></div>
-        <div class="form-field full"><label for="player-email">Email (optional)</label><input id="player-email" type="email" required ...>" maxlength="120" type="email" autocomplete="email" placeholder="Email address"></div>
+        <div class="form-field full"><label for="player-email">Email</label><input id="player-email" maxlength="120" type="email" autocomplete="email" placeholder="Email address" required></div>
       </div>
       <button class="primary-btn" id="start-btn">Start flight operations</button>
     </div>
@@ -1290,7 +1290,17 @@ function dispatchStart(){
 function startGame(){
   const name=($('player-name').value||'').trim().slice(0,80);
   const email=($('player-email').value||'').trim().slice(0,120);
-  state.player = name || 'Anonymous Pilot';
+  if(!name){
+    alert('Please enter your name.');
+    $('player-name')?.focus();
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    alert('Please enter a valid email address.');
+    $('player-email')?.focus();
+    return;
+  }
+  state.player = name;
   state.email = email;
   captureEoi(state.player,email);
   state.score = 0;
