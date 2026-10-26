@@ -8,13 +8,14 @@
 <title>Pin to Win | RFDS Flight Crew Challenge</title>
 <link rel="stylesheet" href="https://use.typekit.net/xup3mwo.css">
 <link rel="stylesheet" href="public/app.css">
+<link rel="stylesheet" href="public/tablet.css">
 </head>
 <body>
 <div id="rfds-sandbox">
 <div id="rfds-app">
 <div class="app">
   <div class="topbar">
-    <div class="brand-badge" id="brand-badge" role="button" tabindex="0" title="Return to start"><span class="brand-mark">RFDS</span><span>Pin to win</span></div>
+    <button class="brand-badge" id="brand-badge" type="button" aria-label="Royal Flying Doctor Service — return to start" title="Return to start"><img class="brand-logo" src="public/rfds-logo.svg" alt="Royal Flying Doctor Service, South Australia and Northern Territory" width="128" height="118" draggable="false"></button>
     <div class="topstat"><span>Flights</span><strong id="top-flights">0 / 3</strong><span class="sep">•</span><span>Score</span><strong id="top-score">0</strong></div>
   </div>
 
@@ -176,8 +177,8 @@
       <h3 id="registration-title">Report for duty.</h3>
       <p>Enter your name for the leaderboard. Email is optional.</p><form id="registration-form" novalidate>
       <div class="modal-grid">
-        <div class="form-field full"><label for="player-name">Full Name</label><input id="player-name" maxlength="80" autocomplete="name" placeholder="Your name" required aria-describedby="registration-error"></div>
-        <div class="form-field full"><label for="player-email">Email <span class="optional-label">(optional)</span></label><input id="player-email" maxlength="120" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="registration-error"></div>
+        <div class="form-field full"><label for="player-name">Full Name</label><input id="player-name" enterkeyhint="next" autocapitalize="words" maxlength="80" autocomplete="name" placeholder="Your name" required aria-describedby="registration-error"></div>
+        <div class="form-field full"><label for="player-email">Email <span class="optional-label">(optional)</span></label><input id="player-email" enterkeyhint="done" autocapitalize="none" spellcheck="false" maxlength="120" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="registration-error"></div>
       </div>
       <p id="registration-error" class="form-error" role="alert"></p><button type="submit" class="primary-btn" id="start-btn">Let’s fly <span aria-hidden="true">→</span></button></form>
     </div>
@@ -196,5 +197,6 @@
 <script src="data/destinations.js"></script>
 <script src="public/app.js"></script>
 <script src="public/conference.js"></script>
+<script src="public/tablet.js"></script>
 </body>
 </html>

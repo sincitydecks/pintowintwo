@@ -174,7 +174,7 @@ function loadMission(){
   $('task-region').textContent=state.current.d.state==='NT'?'Northern Territory':sectionLabel(state.current.d.section);
   $('map-section-pill').textContent=state.current.d.state;
   $('pin-status').textContent='Place a pin to continue.';
-  $('map-hint').textContent='Tap the map to place your pin';
+  $('map-hint').textContent=matchMedia('(pointer: coarse)').matches?'Tap to pin · drag to refine · pinch to zoom':'Tap the map to place your pin';
   [...$('flight-steps').children].forEach((el,i)=>{el.className=i<state.currentIndex?'done':i===state.currentIndex?'current':'';});
   $('task-base').textContent=state.current.base.name;$('map-base-name').textContent=state.current.base.name;
   
@@ -310,10 +310,43 @@ function nextFlight(){
 }
 /* Touch/mouse interaction */
 const mapCanvas=$('map-canvas');
-let drag=null;
-mapCanvas.addEventListener('pointerdown',e=>{if(e.button!==0||state.revealing)return;e.preventDefault();mapCanvas.focus({preventScroll:true});mapCanvas.setPointerCapture?.(e.pointerId);if(state.panMode){drag={p:svgPointFromClient($('game-map-svg'),e.clientX,e.clientY),view:{...mapView}};}else setGuessFromPointer(e);});
-mapCanvas.addEventListener('pointermove',e=>{if(!mapCanvas.hasPointerCapture(e.pointerId))return;if(state.panMode&&drag){const p=svgPointFromClient($('game-map-svg'),e.clientX,e.clientY);mapView.x+=drag.p.x-p.x;mapView.y+=drag.p.y-p.y;applyMapView();}else if(state.guess)setGuessFromPointer(e);});
-mapCanvas.addEventListener('pointerup',()=>drag=null);mapCanvas.addEventListener('pointercancel',()=>drag=null);
+const mapPointers=new Map();let drag=null,pinch=null,multiTouch=false,touchStart=null;
+function touchPoints(){return [...mapPointers.values()];}
+function beginPinch(){
+  const [a,b]=touchPoints();if(!a||!b)return;
+  const centre={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+  pinch={centre,anchor:svgPointFromClient(mapSvg,centre.x,centre.y),distance:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),view:{...mapView},zoom:state.zoom,scale:Math.abs(mapSvg.getScreenCTM()?.a||1)};
+  multiTouch=true;drag=null;
+  // A second finger begins a map gesture; it never leaves a new accidental pin.
+  if(touchStart){state.guess=touchStart.guess;if(state.guess){setSvgCircle($('guess-dot'),state.guess.lat,state.guess.lon,mapSvg);$('guess-dot').style.display='block';}else{$('guess-dot').style.display='none';$('confirm-btn').disabled=true;$('pin-status').textContent='Place a pin to continue.';}}
+}
+mapCanvas.addEventListener('pointerdown',e=>{
+  if(e.button!==0||state.revealing)return;e.preventDefault();mapCanvas.focus({preventScroll:true});mapCanvas.setPointerCapture?.(e.pointerId);
+  mapPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(mapPointers.size>1){beginPinch();return;}
+  touchStart={x:e.clientX,y:e.clientY,guess:state.guess?{...state.guess}:null};
+  if(state.panMode)drag={p:svgPointFromClient(mapSvg,e.clientX,e.clientY)};
+  else if(e.pointerType!=='touch')setGuessFromPointer(e);
+});
+mapCanvas.addEventListener('pointermove',e=>{
+  if(!mapPointers.has(e.pointerId)||state.revealing)return;
+  mapPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinch&&mapPointers.size>=2){
+    const [a,b]=touchPoints(),centre={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    const zoom=clamp(pinch.zoom*Math.hypot(a.x-b.x,a.y-b.y)/pinch.distance,1,4),ratio=(1120/zoom)/pinch.view.w;
+    mapView={x:pinch.anchor.x-(pinch.anchor.x-pinch.view.x)*ratio-(centre.x-pinch.centre.x)/pinch.scale*ratio,y:pinch.anchor.y-(pinch.anchor.y-pinch.view.y)*ratio-(centre.y-pinch.centre.y)/pinch.scale*ratio,w:1120/zoom,h:1029.4/zoom};state.zoom=zoom;applyMapView();return;
+  }
+  if(multiTouch)return;
+  if(state.panMode&&drag){const p=svgPointFromClient(mapSvg,e.clientX,e.clientY);mapView.x+=drag.p.x-p.x;mapView.y+=drag.p.y-p.y;applyMapView();}
+  else if(e.pointerType!=='touch'||Math.hypot(e.clientX-touchStart.x,e.clientY-touchStart.y)>5)setGuessFromPointer(e);
+});
+function finishMapPointer(e){
+  if(!mapPointers.has(e.pointerId))return;
+  if(e.type==='pointerup'&&e.pointerType==='touch'&&!multiTouch&&!state.panMode&&!state.revealing)setGuessFromPointer(e);
+  mapPointers.delete(e.pointerId);
+  if(mapPointers.size===0){drag=null;pinch=null;multiTouch=false;touchStart=null;}
+}
+mapCanvas.addEventListener('pointerup',finishMapPointer);mapCanvas.addEventListener('pointercancel',finishMapPointer);mapCanvas.addEventListener('lostpointercapture',finishMapPointer);
 $('open-start-btn').addEventListener('click',openRegistration);$('registration-form').addEventListener('submit',e=>{e.preventDefault();startGame();});$('registration-close').addEventListener('click',closeRegistration);$('registration-modal').addEventListener('click',e=>{if(e.target.id==='registration-modal')closeRegistration();});
 $('confirm-btn').addEventListener('click',confirmGuess);
 $('next-btn').addEventListener('click',nextFlight);

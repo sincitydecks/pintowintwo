@@ -1,0 +1,42 @@
+/* Landscape conference iPads: keep the map and briefing together, above browser chrome. */
+:root{--header-height:120px;--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-left:env(safe-area-inset-left,0px)}
+.topbar{height:calc(var(--header-height) + var(--safe-top));padding:calc(8px + var(--safe-top)) max(24px,var(--safe-right)) 8px max(24px,var(--safe-left))}
+.brand-badge{padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;flex-shrink:0;min-width:108px;min-height:100px}
+.brand-logo{display:block;width:108px;height:100px;object-fit:contain;-webkit-user-select:none;user-select:none}
+.screen{min-height:var(--app-height,100svh)}
+.game{height:var(--app-height,100svh);padding:calc(var(--header-height) + var(--safe-top) + 8px) max(16px,var(--safe-right)) max(16px,var(--safe-bottom)) max(16px,var(--safe-left))}
+body[data-screen="game"]{overflow:hidden;overscroll-behavior:none}
+.task-panel{align-items:flex-start;overflow-y:auto;overscroll-behavior:contain}.task-content{margin-block:auto}
+.map-canvas{-webkit-user-select:none;-webkit-touch-callout:none}.map-canvas svg{-webkit-user-select:none;-webkit-touch-callout:none}
+.result,.board-screen{padding-top:calc(var(--header-height) + var(--safe-top) + 16px);padding-bottom:max(24px,var(--safe-bottom))}
+.start{padding-top:calc(var(--header-height) + var(--safe-top) + 32px)}
+.modal-shell{top:var(--visual-top,0px);bottom:auto;height:var(--visual-height,100dvh);padding:max(16px,var(--safe-top)) max(20px,var(--safe-right)) max(16px,var(--safe-bottom)) max(20px,var(--safe-left))}
+.modal-card{max-height:calc(var(--visual-height,100dvh) - 40px - var(--safe-top) - var(--safe-bottom));overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+html.registration-open,html.registration-open body{overflow:hidden;overscroll-behavior:none}
+@media(pointer:coarse){
+  .primary-btn,.confirm-btn{min-height:56px;font-size:16px}.text-btn,.board-home-btn,.modal-close{min-height:48px;min-width:48px}
+  .map-controls{gap:6px;padding:6px;bottom:48px}.map-controls button{min-width:52px;height:52px;font-size:16px}.map-hint{font-size:13px;bottom:20px;line-height:1.4}
+  .map-stage{padding-bottom:116px}.form-field input{min-height:54px;font-size:18px}.modal-card{width:min(520px,100%)}
+}
+@media(min-width:701px) and (orientation:landscape) and (min-height:541px){
+  .game{grid-template-columns:minmax(0,1fr) clamp(300px,29vw,360px);gap:16px;min-height:540px}
+  .game-map-panel,.task-panel{min-height:0}.task-panel{padding:24px}.task-heading-block{margin:28px 0 24px}.task-question-big{font-size:clamp(28px,3vw,40px);overflow-wrap:normal}
+  .task-data{margin-bottom:24px}.task-data-row{flex-wrap:wrap;font-size:14px}.task-data-row span{font-size:13px}#task-base{font-size:16px}
+  .task-kicker{font-size:14px}.pin-status{font-size:14px}.task-note{font-size:12px}.task-region{font-size:15px}.pill,.base-map-label{font-size:13px}
+  .task-panel.is-revealing{padding:22px}.task-panel.is-revealing .task-heading-block{margin:20px 0 16px}.task-panel.is-revealing .task-question-big{font-size:28px}
+  .proximity-labels{font-size:12px}#reveal-caption{font-size:13px}.result-card-live{max-width:1120px}.result-top-panel{padding:26px}.live-distance{font-size:clamp(28px,3vw,36px)}
+  .result-map-wrap svg{height:180px}.score-breakdown-panel{padding:22px}.result-feedback{margin-top:14px}.live-score-board{margin:22px 0;gap:20px 14px}
+}
+@media(max-width:700px){:root{--header-height:88px}.brand-badge{min-width:74px;min-height:68px}.brand-logo{width:74px;height:68px}.topbar{padding-inline:max(14px,var(--safe-left)) max(14px,var(--safe-right))}.game{min-height:560px}.map-stage{padding-top:48px}.start{padding-top:calc(var(--header-height) + 24px)}}
+@media(orientation:landscape) and (max-height:540px){:root{--header-height:72px}.brand-badge{min-width:64px;min-height:58px}.brand-logo{width:64px;height:58px}.game{min-height:360px}.task-panel{padding:14px}.task-panel.is-revealing .task-question-big{font-size:20px}}
+@media(hover:none){.primary-btn:hover{background:var(--rfds-red)}.confirm-btn:not(:disabled):hover{background:#fff}.map-controls button:hover{background:#fff}.map-controls button[aria-pressed=true]:hover{background:var(--navy)}}
+@media(min-width:701px) and (orientation:landscape) and (max-height:850px){
+  .start{grid-template-columns:1fr 1fr;gap:32px;padding:calc(var(--header-height) + 18px) 32px 24px}
+  .start h1{font-size:clamp(42px,4.8vw,58px);margin-bottom:18px}.lead{font-size:16px;line-height:1.5;margin-bottom:18px}
+  .how-to{font-size:14px;gap:9px;margin-bottom:20px}.start-detail{margin:12px 0 4px}.map-card{height:min(460px,calc(var(--app-height,100svh) - var(--header-height) - 56px));min-height:0;align-self:center}
+  .map-shell{padding-top:0}.map-caption{font-size:13px;bottom:0;left:5%}
+  .result-top-panel{padding:22px}.result-title{font-size:32px}.result-label{margin-bottom:8px}.result-subline{margin-top:8px}.result-feedback{font-size:14px;line-height:1.45;margin-top:12px}
+  .live-score-board{grid-template-columns:repeat(3,minmax(0,1fr));margin:20px 0;gap:14px}.total-score{grid-column:auto;padding:0;border:0}.live-distance,.live-points,.live-total{font-size:28px}
+  .result-map-wrap svg{height:145px}.result-map-wrap figcaption{margin:6px 0 14px}.score-breakdown-panel{padding:20px}.accuracy-live{padding:14px 0}.breakdown-grid{margin-bottom:14px}.next-row{padding-top:14px}.best-line{margin-bottom:10px}
+}
+@media(min-width:701px) and (orientation:landscape) and (min-height:541px) and (max-height:700px){:root{--header-height:104px}.brand-badge{min-width:96px;min-height:88px}.brand-logo{width:96px;height:88px}.start h1{font-size:44px}.how-to{font-size:13px}.task-panel{padding:20px}.task-heading-block{margin:20px 0}.task-panel.is-revealing .task-heading-block{margin:12px 0}.task-panel.is-revealing .task-question-big{font-size:25px}.task-panel.is-revealing .task-data{margin-bottom:14px}.reveal-distance strong{font-size:36px}.proximity-track{margin-top:20px}#reveal-caption{margin-top:12px}.result-title{font-size:28px}.result-map-wrap svg{height:115px}.result-map-wrap figcaption{font-size:11px}.live-score-board{gap:10px}.live-tile small,.live-status,.live-delta{font-size:11px}}

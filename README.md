@@ -59,3 +59,7 @@ Do not clear site data on the conference iPad while unsynced records remain. A l
 `npm test` runs the backend scoring, validation, idempotency, timezone and privacy checks without credentials. `npm start` serves a static preview on port 3000; live API routes require Vercel.
 
 NT location references and the representative Mt Doreen station coordinate are documented in `NT_LOCATIONS.md`.
+
+## Landscape iPad use
+
+The conference layout keeps the full RFDS SA/NT SVG logo above a side-by-side map and briefing. Touch controls are at least 48 px, map controls are 52 px, and the map supports tap/drag pin placement, two-finger zoom/pan, and explicit Fit/Move map controls. Two-finger gestures preserve the existing guess. Safe-area padding and the visual viewport account for browser bars and the registration keyboard. Screen-size checks covered 1024×768, a reduced 1024×650 browser viewport, 1133×744, 1180×820, 1366×1024, and narrow Split View. These were automated touch/browser emulation checks; a physical iPad Safari check remains recommended before the event.
