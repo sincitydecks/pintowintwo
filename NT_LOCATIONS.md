@@ -1,7 +1,5 @@
 # Northern Territory destinations
 
-Eight additional destinations bring the remote destination pool from 20 to 28. They use the same projection, scoring and random selection as the original destinations, within the existing SA/NT section. The selector still balances sections, rather than allowing the larger NT pool to dominate every challenge.
-
 | Destination | Latitude | Longitude | Game interpretation |
 | --- | ---: | ---: | --- |
 | Mt Doreen Station | -22.089 | 131.422 | Representative station location; exact strip reference needs confirmation. |
@@ -14,16 +12,6 @@ Eight additional destinations bring the remote destination pool from 20 to 28. T
 | Ti Tree | -22.12732 | 133.42237 | Ti Tree Airstrip. |
 
 ## Reference sources and limitations
-
-Checked 26 October 2026. Coordinates are game references. The original project's other destinations remain representative coordinates; this is not a flight-planning dataset.
-
-- Ti Tree: NT Government Place Names Register, https://www.ntlis.nt.gov.au/placenames/view.jsp?id=23612
-- Borroloola: NT Government Place Names Register, https://www.ntlis.nt.gov.au/placenames/view.jsp?id=20366
-- Bathurst Island: NT Government Place Names Register, https://www.ntlis.nt.gov.au/placenames/view.jsp?id=23508
-- Gove: NT Government Place Names Register, https://www.ntlis.nt.gov.au/placenames/view.jsp?id=13241
-- Maningrida: Airservices AIP ERSA, 19 March 2026, 120322S 1341403E, https://www.airservicesaustralia.com/aip/current/ersa/FAC_YMGD_19MAR2026.pdf
-- Elcho Island and Tennant Creek: OurAirports airport records, https://ourairports.com/airports/YELD/ and https://ourairports.com/airports/YTNK/
-- Mt Doreen: representative station coordinate from https://en.wikipedia.org/wiki/Mount_Doreen_Station . An exact, authoritative airstrip coordinate was not established. Do not treat the station coordinate as a verified runway point.
 
 All eight retain Port Augusta as the existing SA/NT **challenge departure** to avoid inventing operational bases or RFDS service routes. The interface describes this as a game route. This does not assert that the RFDS operates each depicted real-world leg.
 
