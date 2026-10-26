@@ -1,26 +1,21 @@
-# Pin to Win refinement
+# Conference game update
 
-- Retained the RFDS navy, cream and orange identity and original Australia map.
-- Reworked the opening layout with short numbered instructions and a direct start button.
-- Added all eight NT destinations to the shared data source (28 remote destinations total).
-- Added map zoom, fit, pan mode and arrow-key pin adjustment (Shift for precision).
-- Moved pin markers into SVG coordinates so they remain registered when zooming or rotating.
-- Replaced blocking registration alerts with inline validation; added dialog focus containment and Escape dismissal.
-- Reduced dispatch to 650 ms; eliminated the multi-second score sequence and respected reduced motion.
-- Added a result map comparing the guess and destination, a prize-qualification message and a clear final leaderboard action.
-- Prevented double confirmations, answer-route disclosure during resize, and incomplete leaderboard submissions.
-- Preserved the `rfds_demo_board` key, existing completed scores, the EOI backup key, API routes, admin and Supabase configuration.
-- Kept the best completed score per player name. Existing name-based identity behavior remains.
-- Consolidated the repeated inline style patches into `public/app.css`.
+- Optional email registration with required leaderboard name; invalid supplied emails are still rejected.
+- Orange glowing departure node, matching map label and orange departure name in the right panel, including on phones.
+- A locked pin begins a 6.2-second sequence: confirmation, aircraft route to the player's guess, distance countdown with red/amber/green proximity bands, destination reveal, then animated points.
+- The true destination is hidden until the reveal reaches its final stage, including during viewport changes. Input is locked throughout the sequence. Reduced-motion mode uses a brief, stationary reveal.
+- No tangible-reward claims appear in the experience.
+- Daily cloud leaderboard with event-timezone dates, server-issued online sessions, server-calculated scores, progress saved per flight and name-safe guest identities.
+- Device journal, resumable incomplete games, idempotent retries and offline recovery with explicit pending/recovered labels.
+- Staff date selection, daily game export and complete device-backup export.
+- Preserved EOI records, API integration and legacy browser leaderboard without attributing undated scores to today.
 
 ## Validation
 
-Browser checks covered eight NT coordinates through map click/projection/scoring; a complete three-flight game; registration errors; keyboard pin placement; zoom/reset/pan; legacy score retention; no incomplete score saves; duplicate confirmation protection; leaderboard reopening; and desktop, iPad, phone and landscape layouts. No application JavaScript errors were observed.
+Eight automated backend checks cover optional email, invalid email, accurate scoring, partial/completed distinction, locked-guess immutability, duplicate retries, forged sessions, same-name players, offline date retention, midnight timezone boundaries and database failure responses.
 
-EOI network responses were stubbed in local browser checks. Live Supabase writes and the deployed admin require the existing production environment and were not exercised.
+A local PostgreSQL-compatible engine verified that the migration applies twice, the daily function selects the best score per participant, equal names remain separate, ties use distance, prior days remain separate, and anonymous roles cannot read the table or invoke the function.
 
-See `NT_LOCATIONS.md` for the Tiwi interpretation and the approximate Mt Doreen station coordinate.
+Browser checks covered desktop, iPad, portrait phones down to 320px, landscape phones, the full six-second reveal, the hidden destination, reduced motion, refresh/resume, a complete three-flight offline game, queued sync and an online server-issued plan. No application JavaScript errors were observed.
 
-## Deployment
-
-Upload the project contents to the existing repository/deployment. Vercel settings remain: Framework **Other**, no build command, no output directory. Keep the same site origin on the event iPad to retain its browser-local leaderboard. No database migration or new environment variables are required for this refinement.
+Production verification depends on applying the migration to the existing Supabase project and deploying the new API routes. The app labels cloud setup failures and retains device progress until this is complete.

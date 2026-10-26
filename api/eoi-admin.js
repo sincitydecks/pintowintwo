@@ -1,60 +1,5 @@
-const crypto = require('node:crypto');
-
-const COOKIE = 'pin_to_win_admin';
-const DEFAULT_EXPIRY_SECONDS = 60 * 60 * 8;
-
-function json(res, status, body) {
-  res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.end(JSON.stringify(body));
-}
-
-function clean(value, max = 1000) {
-  return String(value ?? '').replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, max);
-}
-
-function getPassword() {
-  const configured = String(process.env.PIN_TO_WIN_ADMIN_PASSWORD || '').trim();
-  return configured || '1928';
-}
-
-function getSecret() {
-  return process.env.PIN_TO_WIN_ADMIN_SESSION_SECRET || crypto.createHash('sha256').update(getPassword()).digest('hex');
-}
-
-function sign(payload) {
-  const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const sig = crypto.createHmac('sha256', getSecret()).update(data).digest('base64url');
-  return `${data}.${sig}`;
-}
-
-function verify(token) {
-  try {
-    const [data, sig] = String(token || '').split('.');
-    if (!data || !sig) return false;
-    const expected = crypto.createHmac('sha256', getSecret()).update(data).digest('base64url');
-    const a = Buffer.from(sig);
-    const b = Buffer.from(expected);
-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
-    const payload = JSON.parse(Buffer.from(data, 'base64url').toString('utf8'));
-    return payload && payload.exp && Number(payload.exp) > Math.floor(Date.now() / 1000);
-  } catch {
-    return false;
-  }
-}
-
-function parseCookies(req) {
-  const raw = req.headers.cookie || '';
-  const out = {};
-  raw.split(';').forEach(part => {
-    const i = part.indexOf('=');
-    if (i > -1) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
-  });
-  return out;
-}
-
-function authOk(req) {
-  return verify(parseCookies(req)[COOKIE]);
-}
+const {COOKIE,TTL:DEFAULT_EXPIRY_SECONDS,password:getPassword,secret:getSecret,sign,authOk}=require('../lib/admin-auth');
+const {json,clean,db,config,eventDay}=require('../lib/game');
 
 module.exports = async function handler(req, res) {
   const action = clean((req.query && req.query.action) || 'list', 20).toLowerCase();
@@ -72,6 +17,7 @@ module.exports = async function handler(req, res) {
       body = null;
     }
 
+    if(!getPassword()||!getSecret())return json(res,503,{ok:false,error:'Configure the admin password and session secret in Vercel.'});
     const password = clean(body && body.password, 200);
     if (!password || password !== getPassword()) {
       return json(res, 401, { ok: false, error: 'Incorrect password.' });
@@ -91,6 +37,14 @@ module.exports = async function handler(req, res) {
     return json(res, 401, { ok: false, error: 'Unauthorised.' });
   }
 
+  if(action==='scores'){
+    if(req.method!=='GET')return json(res,405,{ok:false,error:'Method not allowed.'});
+    const conf=config(),day=clean(req.query.day||eventDay(),10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(day))return json(res,400,{ok:false,error:'Invalid date.'});
+    try{const rows=await db(`pin_to_win_games?event_id=eq.${encodeURIComponent(conf.eventId)}&event_day=eq.${day}&select=id,full_name,score,total_distance,completed,source,started_at,email&order=score.desc,total_distance.asc&limit=10000`);return json(res,200,{ok:true,rows,day,...conf});}
+    catch{return json(res,503,{ok:false,error:'Run supabase/pin_to_win_games.sql in the Supabase SQL Editor, then refresh.'});}
+  }
+
   if (action === 'list') {
     if (req.method !== 'GET') {
       res.setHeader('Allow', 'GET');
@@ -108,7 +62,7 @@ module.exports = async function handler(req, res) {
       headers: {
         'Accept': 'application/json',
         'apikey': supabaseSecretKey,
-        'Authorization': `Bearer ${supabaseSecretKey}`
+        ...(supabaseSecretKey.startsWith('eyJ')?{Authorization:`Bearer ${supabaseSecretKey}`}:{})
       }
     });
 

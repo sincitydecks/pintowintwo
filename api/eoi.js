@@ -1,4 +1,3 @@
-const crypto = require('node:crypto');
 
 function json(res, status, body) {
   res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -35,7 +34,7 @@ module.exports = async function handler(req, res) {
     const sourceUrl = clean(body.sourceUrl, 1000);
 
     if (!clientId || !fullName || !validEmail(email)) {
-      return json(res, 400, { ok: false, error: 'Please provide a valid name and email address.' });
+      return json(res, 400, { ok: false, error: 'Please provide your name and a valid email if supplied.' });
     }
 
     const supabaseUrl = String(process.env.SUPABASE_URL || '').replace(/\/$/, '');
@@ -60,6 +59,7 @@ module.exports = async function handler(req, res) {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'apikey': supabaseSecretKey,
+        ...(supabaseSecretKey.startsWith('eyJ')?{Authorization:`Bearer ${supabaseSecretKey}`}:{}),
         'Prefer': 'return=minimal,resolution=ignore-duplicates'
       },
       body: JSON.stringify(record)

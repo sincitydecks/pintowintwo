@@ -1,68 +1,61 @@
-# RFDS PIN TO WIN — UX refinement + Northern Territory
+# RFDS Pin to Win — conference edition
 
-See `UX_CHANGES.md` for changes, verification and deployment notes. See `NT_LOCATIONS.md` for the eight NT locations and coordinate sources.
+Three flights across a shared pool of 28 Australian destinations. A name is required; email is optional. The game links an orange departure node to the briefing panel, then plays a six-second flight and distance reveal after each pin is locked.
 
-# RFDS PIN TO WIN — Final Deployment
+## Deploy
 
-This is the final self-contained PIN TO WIN project with:
+This is static HTML/CSS/JavaScript with Vercel Node.js API functions.
 
-- the Flight Crew Challenge game in `index.html`
-- EOI/name/email capture to Supabase via `api/eoi.js`
-- staff admin dashboard at `/admin.html`
-- CSV export of captured names/emails
-- iPad-local EOI backup if conference Wi-Fi temporarily fails
-- leaderboard backup export from the existing `rfds_demo_board` localStorage key
+- Framework preset: **Other**
+- Root directory: repository root
+- Build command: none
+- Output directory: none
+- Game: `/`
+- Staff dashboard: `/admin.html`
 
-## Critical leaderboard rule
-
-The game deliberately continues to use the existing browser storage key:
-
-`rfds_demo_board`
-
-Do not rename it, clear it, or run `localStorage.clear()` on the conference iPad. Deploying a new version at the same origin does not by itself erase that local leaderboard.
-
-## Supabase
-
-Run `supabase/pin_to_win_eois.sql` in the Supabase SQL Editor.
-
-Project URL:
-
-`https://pzpymyhudenvdfvqkebg.supabase.co`
-
-## Vercel Environment Variables
-
-Set these variables in the Vercel project:
+Existing variables:
 
 - `SUPABASE_URL`
-- `SUPABASE_SECRET_KEY`
-- `PIN_TO_WIN_ADMIN_PASSWORD` = your private admin password
-- `PIN_TO_WIN_ADMIN_SESSION_SECRET` = a long random secret
+- `SUPABASE_SECRET_KEY` — private server key, never a browser key
+- `PIN_TO_WIN_ADMIN_PASSWORD` — private staff password
+- `PIN_TO_WIN_ADMIN_SESSION_SECRET` — stable private signing secret
 
-Never put the Supabase secret key in `index.html` or `admin.html`.
+Optional conference configuration:
 
-## Vercel settings
+- `PIN_TO_WIN_EVENT_ID` — default `rfds-conference`. Change for a new conference.
+- `PIN_TO_WIN_TIMEZONE` — default `Australia/Adelaide`. Set the conference's timezone explicitly if different, e.g. `Australia/Darwin`.
 
-This is a plain static HTML site with Vercel serverless functions in `/api`.
+Daily boards switch at midnight in this timezone. A game belongs to the date it **started**. Prior dates stay archived; no scheduled deletion or reset job is needed.
 
-- Framework Preset: Other
-- Root Directory: repository root (`.`)
-- Build Command: empty
-- Output Directory: empty
+## Database setup
 
-Vercel should automatically deploy `api/eoi.js` as `/api/eoi` and `api/eoi-admin.js` as `/api/eoi-admin`.
+Use the existing Supabase project. Apply `supabase/pin_to_win_games.sql` once in its SQL Editor. It adds only the new game table, index, and daily board function. It does not alter or delete EOI records. The script can be safely run again.
 
-## URLs
+The existing EOI schema is in `supabase/pin_to_win_eois.sql`. Browser/public database roles cannot read or write either private table. The public leaderboard API returns names and scores, never email addresses, player identifiers or tokens. Staff access requires the configured admin password; there is no built-in default password.
 
-Game: `/`
+## Persistence and recovery
 
-Admin: `/admin.html`
+- The server issues an online session and destinations, signs a session token and recalculates all scores from submitted guesses.
+- Every locked pin is journalled before its animation. Online progress is saved after each flight; only three-flight completions rank.
+- Partial games can be resumed on the same device after refresh or closure.
+- If a game begins offline, it keeps its local plan and original start timestamp. Completed offline games are recalculated on the server and marked `recovered offline` when the connection returns. Recovery accepts starts up to 14 days ago and allows five minutes of clock skew.
+- Unique game IDs and immutable locked guesses prevent retries from duplicating scores. A failed record does not stop other valid queued records from syncing.
+- Blank-email players receive separate guest identities even when names match. An email, if provided, identifies a player's best score within each day using a server-side HMAC identifier.
+- The board refreshes every 20 seconds. It reports cached/device-only data and pending scores explicitly when cloud access fails.
+- In the staff dashboard, choose a date to view/export all games for that day, including partial games. Export the full device journal before clearing browser data.
 
-Admin password: use the private value configured in `PIN_TO_WIN_ADMIN_PASSWORD`.
+Local keys:
 
-## How EOI capture works
+- `rfds_pin_to_win_rounds_v2`: dated progress, queued submissions and session credentials
+- `rfds_pin_to_win_config_v2`: conference timezone/event settings
+- `rfds_pin_to_win_board_v2`: last synced board
+- `rfds_pin_to_win_eois`: preserved EOI backup
+- `rfds_demo_board`: preserved legacy undated leaderboard; never cleared or assigned an invented date
 
-When the player starts a game, the entered name/email are immediately copied to a new localStorage safety-backup key:
+Do not clear site data on the conference iPad while unsynced records remain. A local backup belongs to its browser and site origin; cloud records can be read from any event device.
 
-`rfds_pin_to_win_eois`
+## Local checks
 
-The browser then sends the same record to `/api/eoi`, which stores it in Supabase. The admin page combines server records with any local iPad backup records and removes duplicates using the submission ID.
+`npm test` runs the backend scoring, validation, idempotency, timezone and privacy checks without credentials. `npm start` serves a static preview on port 3000; live API routes require Vercel.
+
+NT location references and the representative Mt Doreen station coordinate are documented in `NT_LOCATIONS.md`.

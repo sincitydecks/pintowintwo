@@ -1,5 +1,5 @@
 // Shared game data. NT coordinate sources and the Mt Doreen approximation: see NT_LOCATIONS.md.
-window.DESTINATIONS = [
+const DESTINATIONS = [
   { id:'jandakot', name:'Jandakot', state:'WA', section:'WA', role:'base', lat:-32.097, lon:115.881, difficulty:1, base:'Jandakot' },
   { id:'port-augusta', name:'Port Augusta', state:'SA', section:'SA_NT', role:'base', lat:-32.507, lon:137.772, difficulty:1, base:'Port Augusta' },
   { id:'charleville', name:'Charleville', state:'QLD', section:'QLD', role:'base', lat:-26.413, lon:146.263, difficulty:1, base:'Charleville' },
@@ -35,3 +35,6 @@ window.DESTINATIONS = [
   {"id": "gove", "name": "Gove", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.274467, "lon": 136.823902, "difficulty": 3, "base": "Port Augusta", "area": "Gove Airport \u00b7 Nhulunbuy", "coordinateStatus": "aerodrome"},
   {"id": "ti-tree", "name": "Ti Tree", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -22.12732, "lon": 133.42237, "difficulty": 4, "base": "Port Augusta", "area": "Central Australia", "coordinateStatus": "aerodrome"}
 ];
+
+if(typeof module!=="undefined"&&module.exports)module.exports=DESTINATIONS;
+else window.DESTINATIONS=DESTINATIONS;

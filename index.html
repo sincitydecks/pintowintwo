@@ -24,8 +24,8 @@
         
         <h1>Fly the mission.<br><span>Pin to win.</span></h1>
         <p class="lead">How well do you know Australia?<br>Three destinations. Your best guess. One flight crew challenge.</p>
-        <ol class="how-to"><li>Get your destination.</li><li>Drop your pin on the map.</li><li>Get within 100 km and win a prize.</li></ol>
-        <div class="start-actions"><button class="primary-btn start-cta" id="open-start-btn">Start challenge <span aria-hidden="true">→</span></button></div><p class="start-detail">3 flights · 28 destinations across Australia</p><button class="text-btn" id="start-board-btn">View leaderboard</button>
+        <ol class="how-to"><li>Get your destination.</li><li>Drop your pin on the map.</li><li>Watch your accuracy reveal. Climb today’s leaderboard.</li></ol>
+        <div class="start-actions"><button class="primary-btn start-cta" id="open-start-btn">Start challenge <span aria-hidden="true">→</span></button></div><p class="start-detail">3 flights · 28 destinations across Australia</p><button class="text-btn" id="start-board-btn">View today’s leaderboard</button><div id="resume-panel" class="resume-panel" hidden><p id="resume-label"></p><button id="resume-btn" class="text-btn">Resume saved flight</button></div>
       </div>
 
       <div class="map-card" aria-hidden="true"><div class="map-caption">A big country.<br>A little local knowledge.</div>
@@ -50,8 +50,8 @@
   <section id="screen-game" class="screen" aria-label="Game">
     <div class="game">
       <div class="game-map-panel">
-        <div class="map-toolbar">
-          <div class="pill">Find your destination</div>
+        <div class="map-toolbar"><div class="base-map-label"><i></i><span id="map-base-name">Departure base</span></div>
+          <div class="pill map-instruction">Find your destination</div>
           <div class="pill" id="map-section-pill">SA / NT</div>
         </div>
         <div class="map-stage">
@@ -86,9 +86,13 @@
           <div class="task-kicker"><span>Flight <strong id="task-number">1</strong> of 3</span><div id="flight-steps" class="flight-steps" aria-hidden="true"><i></i><i></i><i></i></div></div>
           <div class="task-heading-block"><h2 id="task-question-big" class="task-question-big"></h2><p id="task-region" class="task-region"></p></div>
           <div class="task-data">
-            <div class="task-data-row"><span>Challenge departure</span><strong id="task-base">Port Augusta</strong></div>
+            <div class="task-data-row"><span>Departure base</span><strong id="task-base">Port Augusta</strong></div>
           </div>
-          <p id="pin-status" class="pin-status">Place a pin to continue.</p><button id="confirm-btn" class="confirm-btn" disabled>Confirm my pin</button><p class="task-note">You can move your pin before confirming.</p>
+          <div id="reveal-panel" class="reveal-panel" hidden aria-live="polite">
+            <p id="reveal-phase">Pin locked</p><div class="reveal-distance"><strong id="reveal-km">—</strong><span>km from destination</span></div>
+            <div class="proximity-track"><span id="proximity-pointer"></span></div><div class="proximity-labels"><span>250+ km</span><span>100</span><span>25</span><span>0</span></div>
+            <p id="reveal-caption">Flight plan confirmed.</p><button id="reveal-continue" class="confirm-btn" hidden>View flight result</button>
+          </div><p id="pin-status" class="pin-status">Place a pin to continue.</p><button id="confirm-btn" class="confirm-btn" disabled>Lock in my location</button><p class="task-note">You can move your pin before confirming.</p>
         </div>
       </aside>
     </div>
@@ -102,7 +106,7 @@
             <div>
               <div class="result-label">Destination located</div>
               <div class="result-title" id="result-destination">OODNADATTA<span>, SA</span></div>
-              <div class="result-subline"><span id="result-flight-label">FLIGHT 1 OF 3</span> complete</div><p id="prize-status" class="prize-status" role="status"></p>
+              <div class="result-subline"><span id="result-flight-label">FLIGHT 1 OF 3</span> complete</div><p id="result-feedback" class="result-feedback" role="status"></p>
             </div>
           </div>
           <div class="live-score-board">
@@ -151,7 +155,7 @@
             </button>
           </div>
         </div>
-        <div id="board-rows"></div>
+        <p id="board-sync-status" class="board-sync-status" role="status"></p><div id="board-rows"></div>
         <div class="board-footer">
           <button id="board-home-footer-btn" class="primary-btn board-action-btn">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:8px;vertical-align:middle"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -170,10 +174,10 @@
       <button class="modal-close" id="registration-close" aria-label="Close">×</button>
       
       <h3 id="registration-title">Report for duty.</h3>
-      <p>Enter your name for the leaderboard and your email to register.</p><form id="registration-form" novalidate>
+      <p>Enter your name for the leaderboard. Email is optional.</p><form id="registration-form" novalidate>
       <div class="modal-grid">
         <div class="form-field full"><label for="player-name">Full Name</label><input id="player-name" maxlength="80" autocomplete="name" placeholder="Your name" required aria-describedby="registration-error"></div>
-        <div class="form-field full"><label for="player-email">Email</label><input id="player-email" maxlength="120" type="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="registration-error"></div>
+        <div class="form-field full"><label for="player-email">Email <span class="optional-label">(optional)</span></label><input id="player-email" maxlength="120" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="registration-error"></div>
       </div>
       <p id="registration-error" class="form-error" role="alert"></p><button type="submit" class="primary-btn" id="start-btn">Let’s fly <span aria-hidden="true">→</span></button></form>
     </div>
@@ -190,418 +194,7 @@
   </div>
 </div>
 <script src="data/destinations.js"></script>
-<script>
-/* RFDS Flight Crew Challenge — standalone Vercel prototype */
-
-const REMOTE = DESTINATIONS.filter(d=>d.role==='remote');
-const BASES = DESTINATIONS.filter(d=>d.role==='base');
-const MAP_BOUNDS={minLon:112,maxLon:154,minLat:-44,maxLat:-10};
-const MAP_SVG={w:1120,h:1029.4};
-const state={firstName:'',surname:'',email:'',player:'',score:0,flights:[],plan:[],currentIndex:0,current:null,guess:null,dispatching:false,eoiClientId:'',roundConfirmed:false,roundId:'',zoom:1,panMode:false};
-
-// Persistent EOI capture. This uses a NEW storage key and never touches
-// the existing rfds_demo_board leaderboard key. The local copy is a
-// safety net in case conference Wi-Fi drops during submission.
-const PIN_TO_WIN_EOI_KEY='rfds_pin_to_win_eois';
-function makeEoiClientId(){
-  if (window.crypto && typeof window.crypto.randomUUID==='function') return window.crypto.randomUUID();
-  return 'eoi-'+Date.now()+'-'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
-}
-function saveLocalEoi(record){
-  try{
-    const stored=JSON.parse(localStorage.getItem(PIN_TO_WIN_EOI_KEY)||'[]');
-    const list=Array.isArray(stored)?stored:[];
-    if(!list.some(x=>x.clientId===record.clientId)) list.push(record);
-    localStorage.setItem(PIN_TO_WIN_EOI_KEY,JSON.stringify(list.slice(-5000)));
-    return true;
-  }catch(err){
-    console.warn('Local EOI backup failed:',err);
-    return false;
-  }
-}
-async function syncEoi(record){
-  try{
-    const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(),5000);
-    const response=await fetch('/api/eoi',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(record),credentials:'same-origin',signal:controller.signal});
-    clearTimeout(timeout);
-    const result=await response.json().catch(()=>({}));
-    if(!response.ok||!result.ok) throw new Error(result.error||'EOI could not be saved to the server.');
-    try{
-      const stored=JSON.parse(localStorage.getItem(PIN_TO_WIN_EOI_KEY)||'[]');
-      if(Array.isArray(stored)){
-        const updated=stored.map(x=>x.clientId===record.clientId?Object.assign({},x,{synced:true}):x);
-        localStorage.setItem(PIN_TO_WIN_EOI_KEY,JSON.stringify(updated));
-      }
-    }catch(err){}
-    return true;
-  }catch(err){
-    console.warn('EOI server sync pending; local backup retained:',err);
-    return false;
-  }
-}
-function captureEoi(name,email){
-  const record={clientId:makeEoiClientId(),submittedAt:new Date().toISOString(),fullName:name||'Anonymous Pilot',email:email||'',sourceUrl:window.location.href,synced:false};
-  state.eoiClientId=record.clientId;
-  saveLocalEoi(record);
-  syncEoi(record);
-  return record;
-}
-
-const $=id=>document.getElementById(id);
-const screens={start:$('screen-start'),game:$('screen-game'),result:$('screen-result'),board:$('screen-board')};
-function showScreen(k){
-  Object.entries(screens).forEach(([key,el])=>el.classList.toggle('active',key===k));
-  document.body.dataset.screen=k;
-  window.scrollTo?.(0,0);
-  if(k!=='start') requestAnimationFrame(()=>{const heading=screens[k].querySelector('h2,.result-title');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}});
-  if(k==='game'){
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        if(state.current && $('game-map-svg') && $('origin-dot')){
-          setSvgCircle($('origin-dot'),state.current.base.lat,state.current.base.lon,$('game-map-svg'));
-          $('origin-dot').style.display='block';
-        }
-        if(state.guess && $('game-map-svg') && $('guess-dot')){
-          setSvgCircle($('guess-dot'),state.guess.lat,state.guess.lon,$('game-map-svg'));
-          $('guess-dot').style.display='block';
-        }
-      });
-    });
-  }
-}
-function clamp(n,a,b){return Math.max(a,Math.min(b,n));}
-function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(window.__rfdsToast);window.__rfdsToast=setTimeout(()=>el.classList.remove('show'),1800);}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function updateTop(){$('top-flights').textContent=`${state.flights.length} / 3`;$('top-score').textContent=state.score.toLocaleString();}
-
-/* The Careers map uses the same projection as its base/waypoint coordinates.
-   This affine transform is fitted from the supplied Careers HTML's exact map nodes. */
-const GEO_X={a:-2735.18218625,b:24.6920924,c:-0.04367975};
-const GEO_Y={a:-223.34059445,b:-0.00419334,c:-27.1108143};
-function latLonToSvg(lat,lon){return {x:GEO_X.a+GEO_X.b*lon+GEO_X.c*lat,y:GEO_Y.a+GEO_Y.b*lon+GEO_Y.c*lat};}
-const geoInv=(function(){
-  const det=GEO_X.b*GEO_Y.c-GEO_X.c*GEO_Y.b;
-  return {
-    lonFrom:(x,y)=>((x-GEO_X.a)*GEO_Y.c-(y-GEO_Y.a)*GEO_X.c)/det,
-    latFrom:(x,y)=>(GEO_X.b*(y-GEO_Y.a)-GEO_Y.b*(x-GEO_X.a))/det
-  };
-})();
-function svgPointFromClient(svg,clientX,clientY){
-  const pt=svg.createSVGPoint();pt.x=clientX;pt.y=clientY;
-  const inv=svg.getScreenCTM()?.inverse(); if(!inv) return null;
-  return pt.matrixTransform(inv);
-}
-function haversineKm(a,b){
-  const R=6371,rad=v=>v*Math.PI/180;
-  const dLat=rad(b.lat-a.lat),dLon=rad(b.lon-a.lon);
-  const h=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
-  return 2*R*Math.asin(Math.sqrt(h));
-}
-function scoreFor(km){
-  const base=Math.max(0,Math.round(1000-km));
-  let bonus=0;
-  if(km<=5) bonus=400;
-  else if(km<=10) bonus=300;
-  else if(km<=25) bonus=200;
-  else if(km<=50) bonus=150;
-  else if(km<=100) bonus=100;
-  return {base,bonus,total:base+bonus};
-}
-function accuracyStatus(km){
-  if(km<=10) return ['PRECISION NAVIGATION','PRECISION NAVIGATION'];
-  if(km<=25) return ['ON COURSE','ON COURSE'];
-  if(km<=50) return ['GOOD NAVIGATION','GOOD NAVIGATION'];
-  if(km<=100) return ['IN THE AREA','IN THE AREA'];
-  if(km<=250) return ['COURSE CORRECTION','COURSE CORRECTION'];
-  return ['OFF COURSE','OFF COURSE'];
-}
-function scenarioFor(d){
-  if(d.state==='NT')return {mission:'Locate the Northern Territory destination',terrain:d.area,copy:'Find the destination on the map.'};
-  if(d.section==='SA_NT' && ['andamooka','marree'].includes(d.id)) return {
-    eyebrow:'BUSH RUN // TASK RECEIVED', type:'PRIMARY & ALLIED HEALTH — BUSH RUN', mission:'Scheduled primary & allied health clinic', vehicle:'Pilatus PC-12',
-    crew:'Multidisciplinary visiting health team', terrain:'Remote South Australian outback',
-    copy:`A scheduled RFDS Bush Run is heading into remote South Australia. A multidisciplinary team of primary and allied health practitioners is travelling to provide a clinic for the local community.`
-  };
-  if(d.section==='VIC_TAS') {
-    if(d.state==='VIC') return {eyebrow:'ROAD TASK // TASK RECEIVED',type:'ROAD PATIENT TRANSPORT',mission:'Non-emergency patient transport',vehicle:'RFDS patient transport ambulance',crew:'RFDS Patient Transport crew',terrain:'Regional Victoria',copy:`An RFDS Patient Transport crew has been tasked with a scheduled regional transfer. The patient is ready for collection and the crew needs to reach the correct destination.`};
-    return {eyebrow:'REGIONAL TASK // TASK RECEIVED',type:'REGIONAL TRANSFER',mission:'Regional patient transfer',vehicle:'Regional RFDS transfer operation',crew:'RFDS transfer crew',terrain:'Bass Strait / Tasmanian regional network',copy:`A regional transfer task has been assigned across the southern network. Your job is to identify the destination before the operational leg begins.`};
-  }
-  if(d.section==='WA') return {eyebrow:'AEROMEDICAL // TASK RECEIVED',type:'PATIENT RETRIEVAL',mission:'Remote patient retrieval',vehicle:'Pilatus PC-12',crew:'RFDS aeromedical crew',terrain:'Remote Western Australian country',copy:`A medical request has been received from a remote community. The RFDS crew is tasked to retrieve the patient and connect them with appropriate further care.`};
-  if(d.section==='QLD') return {eyebrow:'AEROMEDICAL // TASK RECEIVED',type:'PATIENT TRANSFER',mission:'Remote patient transfer',vehicle:'Pilatus PC-12',crew:'RFDS aeromedical crew',terrain:'Queensland outback',copy:`A patient requires transport from an outback community so they can continue their care. The crew is tasked and the destination must be located.`};
-  return {eyebrow:'AEROMEDICAL // TASK RECEIVED',type:'PATIENT TRANSFER',mission:'Aeromedical retrieval / transfer',vehicle:'Pilatus PC-12',crew:'RFDS aeromedical crew',terrain:'Remote South Eastern Section country',copy:`A patient transfer has been requested from a remote community. The crew must navigate to the correct destination and connect the patient with further care.`};
-}
-
-function sectionLabel(s){return ({WA:'Western Australia',SA_NT:'South Australia / Northern Territory',QLD:'Queensland',NSW_SE:'South Eastern Section / NSW',VIC_TAS:'Victoria / Tasmania'})[s]||s;}
-function terrain(d){return d.difficulty>=5?'Very remote country':d.difficulty>=4?'Remote country':'Regional country';}
-function pickPlan(){
-  const bySection={WA:[],SA_NT:[],QLD:[],NSW_SE:[],VIC_TAS:[]};
-  REMOTE.forEach(d=>bySection[d.section].push(d));
-  Object.values(bySection).forEach(arr=>{for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}});
-  const ordered=['WA','SA_NT','QLD','NSW_SE','VIC_TAS'];
-  const chosen=ordered.flatMap(s=>bySection[s].slice(0,2));
-  const p=[...chosen];
-  for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]];}
-  return p.slice(0,3).map((d,i)=>{const s=scenarioFor(d);return {id:`mission-${Date.now()}-${i}`,destinationId:d.id,d,base:BASES.find(b=>b.id===({WA:'jandakot',SA_NT:'port-augusta',QLD:'charleville',NSW_SE:'broken-hill',VIC_TAS:'essendon'}[d.section]))||BASES[0],scenario:s};});
-}
-function setSvgCircle(el,lat,lon,svg){
-  if(!el||!svg)return;
-  const p=latLonToSvg(lat,lon);el.setAttribute('cx',p.x);el.setAttribute('cy',p.y);
-  const matrix=svg.getScreenCTM();if(matrix&&matrix.a)el.setAttribute('r',(el.id==='origin-dot'?5:9)/Math.abs(matrix.a));
-}
-function drawRoute(){
-  const svg=$('game-map-svg'),path=$('route-path'); if(!svg||!state.current||!state.guess||!state.roundConfirmed)return;
-  const d=state.current.d, origin=latLonToSvg(state.current.base.lat,state.current.base.lon), dest=latLonToSvg(d.lat,d.lon), guess=latLonToSvg(state.guess.lat,state.guess.lon);
-  const mx=(origin.x+dest.x)/2,my=Math.min(origin.y,dest.y)-Math.max(70,Math.abs(origin.x-dest.x)*.12);
-  path.setAttribute('d',`M ${origin.x} ${origin.y} Q ${mx} ${my} ${dest.x} ${dest.y}`);
-}
-function loadMission(){
-  state.current=state.plan[state.currentIndex]; state.guess=null;state.roundConfirmed=false;resetMap();
-  $('task-number').textContent=String(state.currentIndex+1);
-  $('task-question-big').textContent=state.current.d.name;
-  $('task-region').textContent=state.current.d.state==='NT'?'Northern Territory':sectionLabel(state.current.d.section);
-  $('map-section-pill').textContent=state.current.d.state;
-  $('pin-status').textContent='Place a pin to continue.';
-  $('map-hint').textContent='Tap the map to place your pin';
-  [...$('flight-steps').children].forEach((el,i)=>{el.className=i<state.currentIndex?'done':i===state.currentIndex?'current':'';});
-  $('task-base').textContent=state.current.base.name;
-  
-  $('guess-dot').style.display='none';$('actual-dot').style.display='none';$('route-path').setAttribute('d','');
-  $('confirm-btn').disabled=true;
-  
-  requestAnimationFrame(()=>{
-    if(state.current && $('game-map-svg') && $('origin-dot')){
-      setSvgCircle($('origin-dot'),state.current.base.lat,state.current.base.lon,$('game-map-svg'));
-      $('origin-dot').style.display='block';
-    }
-  });
-  updateTop();
-}
-function openRegistration(){
-  $('registration-error').textContent='';
-  $('registration-modal').classList.add('open');$('registration-modal').setAttribute('aria-hidden','false');
-  document.querySelectorAll('.screen,.topbar').forEach(el=>el.inert=true);
-  $('player-name').focus();
-}
-function closeRegistration(){
-  $('registration-modal').classList.remove('open');$('registration-modal').setAttribute('aria-hidden','true');
-  document.querySelectorAll('.screen,.topbar').forEach(el=>el.inert=false);
-  $('open-start-btn').focus();
-}
-function dispatchStart(){
-  state.dispatching=true;closeRegistration();
-  const overlay=$('dispatch-overlay');overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
-  $('dispatch-scramble').textContent='Ready for take-off.';$('dispatch-status').textContent='Your first destination is ready.';
-  setTimeout(()=>{overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');state.dispatching=false;loadMission();showScreen('game');},matchMedia('(prefers-reduced-motion: reduce)').matches?0:650);
-}
-function startGame(){
-  if(state.dispatching)return;
-  $('registration-error').textContent='';
-  ['player-name','player-email'].forEach(id=>$(id).removeAttribute('aria-invalid'));
-  const name=($('player-name').value||'').trim().slice(0,80);
-  const email=($('player-email').value||'').trim().slice(0,120);
-  if(!name){
-    $('registration-error').textContent='Enter your name to join the leaderboard.';$('player-name').setAttribute('aria-invalid','true');
-    $('player-name')?.focus();
-    return;
-  }
-  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    $('registration-error').textContent='Enter a valid email address, such as you@example.com.';$('player-email').setAttribute('aria-invalid','true');
-    $('player-email')?.focus();
-    return;
-  }
-  state.player = name;
-  state.email = email;
-  captureEoi(state.player,email);
-  state.score = 0;
-  state.flights = [];
-  state.currentIndex = 0;
-  state.plan = pickPlan();state.roundId=makeEoiClientId();
-  dispatchStart();
-}
-function setGuessFromPointer(e){
-  const svg=$('game-map-svg'), p=svgPointFromClient(svg,e.clientX,e.clientY); if(!p)return;
-  if(p.x<0||p.x>MAP_SVG.w||p.y<0||p.y>MAP_SVG.h)return;
-  const lon=geoInv.lonFrom(p.x,p.y),lat=geoInv.latFrom(p.x,p.y);
-  if(lon<MAP_BOUNDS.minLon-2||lon>MAP_BOUNDS.maxLon+2||lat<MAP_BOUNDS.minLat-2||lat>MAP_BOUNDS.maxLat+2)return;
-  if(state.roundConfirmed)return;
-  state.guess={lat,lon};
-  setSvgCircle($('guess-dot'),lat,lon,svg);
-  $('guess-dot').style.display='block';
-  $('map-hint').textContent='Pin placed — refine then confirm';
-  $('confirm-btn').disabled=false;
-  $('pin-status').textContent='Pin placed. Ready when you are.';
-}
-function animateNumber(el,from,to,duration=250,prefix=''){duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:Math.min(duration,250);const start=performance.now();function tick(now){const p=duration===0?1:Math.min(1,(now-start)/duration);const e=1-Math.pow(1-p,3);const v=Math.round(from+(to-from)*e);el.textContent=prefix+v.toLocaleString();if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)}
-function confirmGuess(){
-  if(!state.guess||!state.current||state.roundConfirmed)return;
-  state.roundConfirmed=true;
-  const d=state.current.d;
-  const dist=haversineKm(state.guess,{lat:d.lat,lon:d.lon});
-  const scoring=scoreFor(dist);
-  const priorTotal=state.score; state.score+=scoring.total;
-  state.flights.push({destination:d.name,distanceKm:dist,score:scoring.total,base:scoring.base,bonus:scoring.bonus});
-  setSvgCircle($('actual-dot'),d.lat,d.lon,$('game-map-svg'));$('actual-dot').style.display='block'; drawRoute();
-  const [statusText]=accuracyStatus(dist);
-  const fill=Math.max(3,Math.min(100,100-(dist/3)));
-  $('result-destination').innerHTML=`${d.name.toUpperCase()}<span>, ${d.state}</span>`;
-  $('route-origin').textContent=state.current.base.name.toUpperCase(); $('route-dest').textContent=d.name.toUpperCase();
-  $('result-flight-label').textContent=`Flight ${state.currentIndex+1} of 3`;
-  $('next-btn').textContent=state.currentIndex===2?'See final leaderboard':'Next flight →';
-  $('prize-status').textContent=dist<=100?'Within 100 km — prize qualifying pin!':'Outside 100 km — '+(state.currentIndex<2?'another flight to go.':'challenge complete.');
-  $('prize-status').classList.toggle('qualified',dist<=100);
-  renderResultMap();
-  $('result-distance').textContent='0 KM'; $('result-score').textContent='+0'; $('result-total').textContent=priorTotal.toLocaleString();
-  $('result-base-points').textContent='+0';$('result-bonus-points').textContent='+0';$('result-flight-total').textContent='+0';
-  $('accuracy-label').textContent='CALCULATING';$('accuracy-status').textContent='CALCULATING';
-  $('accuracy-live-fill').style.transform='scaleX(0)'; $('personal-best').textContent='Personal best: calculating...';
-  $('leader-shift').textContent='UPDATING LEADERBOARD';
-  showScreen('result');
-  $('result-distance').textContent=`${dist.toFixed(1)} km`;$('accuracy-status').textContent=statusText;
-  $('result-base-points').textContent='+'+scoring.base.toLocaleString();$('result-bonus-points').textContent='+'+scoring.bonus.toLocaleString();$('result-flight-total').textContent='+'+scoring.total.toLocaleString();
-  animateNumber($('result-score'),0,scoring.total,250,'+');animateNumber($('result-total'),priorTotal,state.score,250);
-  $('accuracy-label').textContent=statusText;$('accuracy-live-fill').style.transform=`scaleX(${fill/100})`;
-  $('personal-best').textContent=`Closest pin: ${Math.min(...state.flights.map(f=>f.distanceKm)).toFixed(1)} km`;
-  $('leader-shift').textContent=`${state.flights.length} of 3 flights complete`;updateTop();
-
-}
-function nextFlight(){
-  if(!state.roundConfirmed)return;
-  if(state.currentIndex>=state.plan.length-1){saveCompletedScore();populateBoard();showScreen('board');return;}
-  state.currentIndex++;loadMission();showScreen('game');
-}
-function readBoard(){
-  try{const entries=JSON.parse(localStorage.getItem('rfds_demo_board')||'[]');return Array.isArray(entries)?entries.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(x.score)&&x.flights===3):[];}catch{return [];}
-}
-function saveCompletedScore(){
-  if(state.flights.length!==3)return;
-  const stored=readBoard();
-  const merged=[...stored.filter(x=>x.name!==state.player||x.score>state.score),{id:state.roundId,name:state.player,score:state.score,flights:3}];
-  // Reduce each player to their highest score, including older entries without IDs.
-  const unique=merged.sort((a,b)=>b.score-a.score).filter((x,i,all)=>all.findIndex(y=>y.name===x.name)===i).slice(0,20);
-  try{localStorage.setItem('rfds_demo_board',JSON.stringify(unique));}catch{toast('Leaderboard could not save on this device.');}
-}
-function populateBoard(){
-  const merged=readBoard().sort((a,b)=>b.score-a.score);
-  $('board-rows').innerHTML=merged.length?merged.map((x,i)=>`<div class="board-row ${x.name===state.player?'is-you':''}"><div class="rank">${i+1}</div><div class="pilot">${escapeHtml(x.name)}<small>3 flights${x.name===state.player?' · You':''}</small></div><div class="score">${Number(x.score).toLocaleString()}</div></div>`).join(''):'<p class="board-empty">No flights logged yet. Be the first on the board.</p>';
-  $('board-event-stat').textContent=`${merged.length} pilots · this device`;
-}
-
-/* Touch/mouse interaction */
-const mapCanvas=$('map-canvas');
-let drag=null;
-mapCanvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();mapCanvas.focus({preventScroll:true});mapCanvas.setPointerCapture?.(e.pointerId);if(state.panMode){drag={p:svgPointFromClient($('game-map-svg'),e.clientX,e.clientY),view:{...mapView}};}else setGuessFromPointer(e);});
-mapCanvas.addEventListener('pointermove',e=>{if(!mapCanvas.hasPointerCapture(e.pointerId))return;if(state.panMode&&drag){const p=svgPointFromClient($('game-map-svg'),e.clientX,e.clientY);mapView.x+=drag.p.x-p.x;mapView.y+=drag.p.y-p.y;applyMapView();}else if(state.guess)setGuessFromPointer(e);});
-mapCanvas.addEventListener('pointerup',()=>drag=null);mapCanvas.addEventListener('pointercancel',()=>drag=null);
-$('open-start-btn').addEventListener('click',openRegistration);$('registration-form').addEventListener('submit',e=>{e.preventDefault();startGame();});$('registration-close').addEventListener('click',closeRegistration);$('registration-modal').addEventListener('click',e=>{if(e.target.id==='registration-modal')closeRegistration();});
-$('confirm-btn').addEventListener('click',confirmGuess);
-$('next-btn').addEventListener('click',nextFlight);
-$('start-board-btn').addEventListener('click',()=>{populateBoard();showScreen('board');});
-
-function returnToHome(){
-  state.score=0;
-  state.flights=[];
-  state.currentIndex=0;
-  state.current=null;
-  state.guess=null;
-  state.dispatching=false;
-  const nameInput=$('player-name'); if(nameInput) nameInput.value='';
-  const emailInput=$('player-email'); if(emailInput) emailInput.value='';
-  if($('guess-dot')) $('guess-dot').style.display='none';
-  if($('actual-dot')) $('actual-dot').style.display='none';
-  if($('origin-dot')) $('origin-dot').style.display='none';
-  if($('route-path')) $('route-path').setAttribute('d','');
-  if($('confirm-btn')) $('confirm-btn').disabled=true;
-  updateTop();
-  showScreen('start');
-  $('open-start-btn').focus();
-}
-$('board-home-btn')?.addEventListener('click',returnToHome);
-$('board-home-footer-btn')?.addEventListener('click',returnToHome);
-$('brand-badge')?.addEventListener('click',()=>{
-  if(screens.board?.classList.contains('active') || screens.result?.classList.contains('active')){
-    returnToHome();
-  } else if(!screens.start?.classList.contains('active')){
-    if(confirm('Return to home screen? Current mission progress will reset.')){
-      returnToHome();
-    }
-  }
-});
-$('brand-badge')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('brand-badge').click();}});
-
-/* SVG-native markers stay registered through zoom, pan, resize and rotation. */
-const mapSvg=$('game-map-svg');
-const svgNS='http://www.w3.org/2000/svg';
-mapSvg.appendChild($('route-path'));
-$('route-svg').remove();
-for(const [id,r,fill,stroke] of [['origin-dot',6,'#fff','#00205B'],['guess-dot',10,'#c74413','#fff'],['actual-dot',10,'#19a486','#fff']]){
-  $(id).remove();const marker=document.createElementNS(svgNS,'circle');
-  marker.id=id;marker.setAttribute('r',r);marker.setAttribute('fill',fill);marker.setAttribute('stroke',stroke);marker.setAttribute('stroke-width','2.5');marker.setAttribute('vector-effect','non-scaling-stroke');marker.style.display='none';marker.style.pointerEvents='none';mapSvg.appendChild(marker);
-}
-let mapView={x:0,y:0,w:1120,h:1029.4};
-function applyMapView(){
-  mapView.x=clamp(mapView.x,-30,1150-mapView.w);mapView.y=clamp(mapView.y,-30,1059.4-mapView.h);
-  mapSvg.setAttribute('viewBox',`${mapView.x} ${mapView.y} ${mapView.w} ${mapView.h}`);
-  const matrix=mapSvg.getScreenCTM();const scale=matrix?Math.abs(matrix.a):1;[['origin-dot',5],['guess-dot',9],['actual-dot',9]].forEach(([id,r])=>$(id).setAttribute('r',r/(scale||1)));
-  $('zoom-in').disabled=state.zoom>=4;$('zoom-out').disabled=state.zoom<=1;
-}
-function resetMap(){
-  state.zoom=1;state.panMode=false;mapView={x:0,y:0,w:1120,h:1029.4};applyMapView();
-  $('pan-toggle').setAttribute('aria-pressed','false');mapCanvas.classList.remove('pan-mode');
-}
-function zoomMap(direction){
-  const zoom=clamp(state.zoom*direction,1,4);const w=1120/zoom,h=1029.4/zoom;
-  const pin=state.guess?latLonToSvg(state.guess.lat,state.guess.lon):null;
-  const centre=pin&&pin.x>=mapView.x&&pin.x<=mapView.x+mapView.w&&pin.y>=mapView.y&&pin.y<=mapView.y+mapView.h?pin:{x:mapView.x+mapView.w/2,y:mapView.y+mapView.h/2};
-  mapView={x:centre.x-w/2,y:centre.y-h/2,w,h};state.zoom=zoom;applyMapView();
-}
-$('zoom-in').addEventListener('click',()=>zoomMap(1.6));$('zoom-out').addEventListener('click',()=>zoomMap(1/1.6));$('map-reset').addEventListener('click',resetMap);
-$('pan-toggle').addEventListener('click',()=>{state.panMode=!state.panMode;$('pan-toggle').setAttribute('aria-pressed',String(state.panMode));mapCanvas.classList.toggle('pan-mode',state.panMode);$('map-hint').textContent=state.panMode?'Drag to move the map. Switch off Move map to place a pin.':state.guess?'Pin placed — refine then confirm':'Tap the map to place your pin';});
-mapCanvas.addEventListener('keydown',e=>{
-  if(['+','=','-','Home'].includes(e.key)){e.preventDefault();e.key==='Home'?resetMap():zoomMap(e.key==='-'?1/1.6:1.6);return;}
-  const moves={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};if(!moves[e.key]||state.roundConfirmed)return;e.preventDefault();
-  const p=state.guess?latLonToSvg(state.guess.lat,state.guess.lon):{x:mapView.x+mapView.w/2,y:mapView.y+mapView.h/2};
-  const step=(e.shiftKey?2:12)/state.zoom;const delta=moves[e.key];const point=mapSvg.createSVGPoint();point.x=clamp(p.x+delta[0]*step,0,1120);point.y=clamp(p.y+delta[1]*step,0,1029.4);const client=point.matrixTransform(mapSvg.getScreenCTM());setGuessFromPointer({clientX:client.x,clientY:client.y});
-});
-$('registration-modal').addEventListener('keydown',e=>{
-  if(e.key==='Escape'){e.preventDefault();closeRegistration();}
-  if(e.key==='Tab'){const items=[...$('registration-modal').querySelectorAll('button,input')];const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
-});
-function renderResultMap(){
-  const svg=mapSvg.cloneNode(true);svg.removeAttribute('id');svg.removeAttribute('class');svg.setAttribute('viewBox','0 0 1120 1029.4');svg.setAttribute('role','img');svg.setAttribute('aria-label',`Your pin and the destination: ${state.current.d.name}`);
-  svg.querySelector('#origin-dot')?.remove();
-  svg.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
-  const circles=[...svg.querySelectorAll('circle')];circles.forEach(el=>el.setAttribute('r','24'));
-  const a=latLonToSvg(state.guess.lat,state.guess.lon),b=latLonToSvg(state.current.d.lat,state.current.d.lon);
-  const line=document.createElementNS(svgNS,'line');for(const [key,value] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:'#c74413','stroke-width':4,'stroke-dasharray':'8 8'}))line.setAttribute(key,value);svg.querySelector('.route-path')?.remove();svg.insertBefore(line,svg.querySelector('circle'));
-  $('result-map').replaceChildren(svg);
-}
-
-updateTop();
-
-window.addEventListener('resize',()=>{
-  if(screens.game?.classList.contains('active') && state.current && $('game-map-svg')){
-    if($('origin-dot')?.style.display!=='none') setSvgCircle($('origin-dot'),state.current.base.lat,state.current.base.lon,$('game-map-svg'));
-    if(state.guess && $('guess-dot')?.style.display!=='none') setSvgCircle($('guess-dot'),state.guess.lat,state.guess.lon,$('game-map-svg'));
-    if($('actual-dot')?.style.display!=='none') setSvgCircle($('actual-dot'),state.current.d.lat,state.current.d.lon,$('game-map-svg'));
-    drawRoute();
-  }
-});
-
-/* CMS breakout protection retained from RFDS source */
-(function unleashSandbox(){
-  try{
-    const sandbox=document.getElementById('rfds-sandbox');if(!sandbox)return;
-    let parent=sandbox.parentElement;
-    while(parent&&parent.tagName!=='BODY'&&parent.tagName!=='HTML'){
-      const style=window.getComputedStyle(parent);
-      if(style.overflow==='hidden'||style.overflow==='clip')parent.style.setProperty('overflow','visible','important');
-      if(style.overflowX==='hidden'||style.overflowX==='clip')parent.style.setProperty('overflow-x','visible','important');
-      if(style.maxWidth&&style.maxWidth!=='none'&&style.maxWidth!=='100%')parent.style.setProperty('max-width','none','important');
-      parent=parent.parentElement;
-    }
-  }catch(e){console.warn('rfds-sandbox breakout restricted:',e);}
-})();
-</script>
+<script src="public/app.js"></script>
+<script src="public/conference.js"></script>
 </body>
 </html>
