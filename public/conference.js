@@ -9,7 +9,7 @@ async function gameRequest(action,body,timeout=7000){
   try{const response=await fetch('/api/game?action='+action,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},body:body?JSON.stringify(body):undefined,signal:controller.signal,cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok){const error=new Error(data.error||'Cloud connection unavailable.');error.setupRequired=!!data.setupRequired;error.status=response.status;throw error;}return data;}finally{clearTimeout(timer);}
 }
 function savedRounds(){const list=readStored(ROUNDS_KEY,[]);return Array.isArray(list)?list:[];}
-function storeRound(record){const records=savedRounds();const index=records.findIndex(r=>r.id===record.id);if(index<0)records.push(record);else records[index]=record;writeStored(ROUNDS_KEY,records);}
+function storeRound(record){const records=savedRounds();const index=records.findIndex(r=>r.id===record.id);if(index<0)records.push(record);else{if(Object.prototype.hasOwnProperty.call(records[index],'hiddenAt'))record.hiddenAt=records[index].hiddenAt;records[index]=record;}writeStored(ROUNDS_KEY,records);}
 function persistProgress(){
   if(!state.session||(state.session.completed&&state.flights.length<3))return;
   state.session.guesses=state.flights.map(f=>f.guess);
@@ -47,7 +47,7 @@ async function syncPending(){
 function saveCompletedScore(){persistProgress();}
 function sortRows(rows){return rows.sort((a,b)=>b.score-a.score||(a.total_distance||0)-(b.total_distance||0)||String(a.startedAt||'').localeCompare(String(b.startedAt||''))||String(a.id).localeCompare(String(b.id)));}
 function localBoard(){
-  const rows=savedRounds().filter(r=>r.completed&&r.eventId===conference.eventId).map(r=>({id:r.id,name:r.name,score:r.score,total_distance:r.guesses.reduce((sum,g,i)=>sum+haversineKm(g,REMOTE.find(d=>d.id===r.plan[i])),0),source:r.source,pending:!r.synced,local:true,startedAt:r.startedAt,playerKey:r.email?r.email.toLowerCase():r.id}));
+  const rows=savedRounds().filter(r=>r.completed&&!r.hiddenAt&&r.eventId===conference.eventId).map(r=>({id:r.id,name:r.name,score:r.score,total_distance:r.guesses.reduce((sum,g,i)=>sum+haversineKm(g,REMOTE.find(d=>d.id===r.plan[i])),0),source:r.source,pending:!r.synced,local:true,startedAt:r.startedAt,playerKey:r.email?r.email.toLowerCase():r.id}));
   const best=new Map();for(const row of sortRows(rows))if(!best.has(row.playerKey))best.set(row.playerKey,row);return [...best.values()].slice(0,20);
 }
 function renderBoard(rows,label){

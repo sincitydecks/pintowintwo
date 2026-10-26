@@ -63,3 +63,15 @@ NT location references and the representative Mt Doreen station coordinate are d
 ## Landscape iPad use
 
 The conference layout keeps the full RFDS SA/NT SVG logo above a side-by-side map and briefing. Touch controls are at least 48 px, map controls are 52 px, and the map supports tap/drag pin placement, two-finger zoom/pan, and explicit Fit/Move map controls. Two-finger gestures preserve the existing guess. Safe-area padding and the visual viewport account for browser bars and the registration keyboard. Screen-size checks covered 1024×768, a reduced 1024×650 browser viewport, 1133×744, 1180×820, 1366×1024, and narrow Split View. These were automated touch/browser emulation checks; a physical iPad Safari check remains recommended before the event.
+
+## Admin sign-in and leaderboard management
+
+The top-right **Admin sign-in** link opens `/admin.html` in another tab so an active game is retained. Staff use the existing `PIN_TO_WIN_ADMIN_PASSWORD`; it is never embedded in public code. Sessions use an eight-hour HttpOnly, Secure, SameSite=Strict cookie. Sign out before returning a shared iPad to players.
+
+The dashboard downloads the exact current top-20 leaderboard, exports every page of game history (all dates by default, optional date/removal filters), preserves EOI export and device backup, and lets staff remove or restore individual attempts. CSV cells are escaped and spreadsheet formulas are neutralised.
+
+**Clear leaderboard** requires typing `CLEAR LEADERBOARD`. It archives completed games saved before the displayed board was loaded, across every date in the current event. Partial games and newly saved completions continue normally. No game or EOI is deleted; archived games remain downloadable and individually restorable. Removing a best attempt can reveal the same participant’s previous-best attempt.
+
+The server requires a valid admin cookie, POST, JSON and an explicit same-origin admin request header for moderation. All queries are scoped to the configured event. Private game lists are paginated at 100 per page; exports fetch every page rather than silently stopping at the database row limit. A failed page aborts the export.
+
+For an existing installation, apply `supabase/pin_to_win_moderation.sql` once; fresh installations can use the complete `supabase/pin_to_win_games.sql`. It adds `hidden_at`, keeps table access private, and excludes removed games from both public ranking functions. The production moderation migration was applied on 26 October 2026.

@@ -23,3 +23,7 @@ Production verification completed on 26 October 2026: the additive scores migrat
 ## Perpetual high scores
 
 The main board now ranks completed games across all dates, including existing saved games. Best score per email participant, independent blank-email guest attempts, distance and earliest-attempt tie breaks, and private server access remain in place. Daily archive queries and staff date exports are retained. The offline board also spans all dates and uses a separate all-time cache so a prior daily snapshot cannot appear as an all-time result.
+
+## Admin management
+
+Top-right staff sign-in opens the password-protected dashboard in a separate tab. Staff can download the public high-score table, export all pages of game history and captured entries, remove/restore attempts, and clear completed high scores after typed confirmation. Clearing archives records without deleting them. Active games are preserved; removed games are excluded by the database ranking functions, so another sync cannot put them back. Staff can still retrieve removed records and device backups. API tests cover authentication, same-origin mutation controls, validation, paging and failure responses; browser checks cover sign-in, CSV exports, removal, restore, clear/cancel and sign-out at a landscape iPad viewport.

@@ -29,6 +29,7 @@ module.exports = async function handler(req, res) {
   }
 
   if (action === 'logout') {
+    if(req.method!=='POST')return json(res,405,{ok:false,error:'Method not allowed.'});
     res.setHeader('Set-Cookie', `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
     return json(res, 200, { ok: true });
   }
@@ -57,8 +58,10 @@ module.exports = async function handler(req, res) {
       return json(res, 500, { ok: false, error: 'Database service is not configured.' });
     }
 
+    const offset=Number(req.query?.offset||0);
+    if(!Number.isSafeInteger(offset)||offset<0)return json(res,400,{ok:false,error:'Invalid page.'});
     const query = encodeURIComponent('id,client_id,submitted_at,full_name,email,source_url');
-    const response = await fetch(`${supabaseUrl}/rest/v1/pin_to_win_eois?select=${query}&order=submitted_at.desc`, {
+    const response = await fetch(`${supabaseUrl}/rest/v1/pin_to_win_eois?select=${query}&order=submitted_at.desc,id.desc&offset=${offset}&limit=501`, {
       headers: {
         'Accept': 'application/json',
         'apikey': supabaseSecretKey,
@@ -73,7 +76,7 @@ module.exports = async function handler(req, res) {
     }
 
     const rows = await response.json();
-    return json(res, 200, { ok: true, rows: Array.isArray(rows) ? rows : [] });
+    return json(res, 200, { ok: true, rows: Array.isArray(rows) ? rows.slice(0,500) : [], hasMore: Array.isArray(rows)&&rows.length>500 });
   }
 
   return json(res, 400, { ok: false, error: 'Unknown action.' });

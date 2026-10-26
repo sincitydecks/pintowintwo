@@ -20,6 +20,7 @@ create table if not exists public.pin_to_win_games (
   updated_at timestamptz not null default now(),
   check (not completed or jsonb_array_length(guesses) = 3)
 );
+alter table public.pin_to_win_games add column if not exists hidden_at timestamptz;
 alter table public.pin_to_win_games enable row level security;
 revoke all on public.pin_to_win_games from anon, authenticated;
 grant usage on schema public to service_role;
@@ -33,7 +34,7 @@ language sql stable security invoker set search_path = '' as $$
   from (
     select distinct on (g.player_id) g.id,g.full_name,g.score,g.total_distance,g.source,g.started_at
     from public.pin_to_win_games g
-    where g.event_id=event_key and g.event_day=day_key and g.completed
+    where g.event_id=event_key and g.event_day=day_key and g.completed and g.hidden_at is null
     order by g.player_id,g.score desc,g.total_distance asc,g.started_at asc,g.id
   ) b
   order by b.score desc,b.total_distance asc,b.started_at asc,b.id
@@ -52,7 +53,7 @@ language sql stable security invoker set search_path = '' as $$
   from (
     select distinct on (g.player_id) g.id,g.full_name,g.score,g.total_distance,g.source,g.started_at
     from public.pin_to_win_games g
-    where g.event_id=event_key and g.completed
+    where g.event_id=event_key and g.completed and g.hidden_at is null
     order by g.player_id,g.score desc,g.total_distance asc,g.started_at asc,g.id
   ) b
   order by b.score desc,b.total_distance asc,b.started_at asc,b.id
@@ -60,5 +61,6 @@ language sql stable security invoker set search_path = '' as $$
 $$;
 revoke all on function public.pin_to_win_all_time_board(text) from public, anon, authenticated;
 grant execute on function public.pin_to_win_all_time_board(text) to service_role;
+create index if not exists pin_to_win_games_visible_scores on public.pin_to_win_games(event_id,player_id,score desc,total_distance asc,started_at asc,id) where completed and hidden_at is null;
 commit;
 notify pgrst, 'reload schema';
