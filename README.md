@@ -1,3 +1,7 @@
+# RFDS PIN TO WIN — UX refinement + Northern Territory
+
+See `UX_CHANGES.md` for changes, verification and deployment notes. See `NT_LOCATIONS.md` for the eight NT locations and coordinate sources.
+
 # RFDS PIN TO WIN — Final Deployment
 
 This is the final self-contained PIN TO WIN project with:
@@ -31,7 +35,7 @@ Set these variables in the Vercel project:
 
 - `SUPABASE_URL`
 - `SUPABASE_SECRET_KEY`
-- `PIN_TO_WIN_ADMIN_PASSWORD` = `1928`
+- `PIN_TO_WIN_ADMIN_PASSWORD` = your private admin password
 - `PIN_TO_WIN_ADMIN_SESSION_SECRET` = a long random secret
 
 Never put the Supabase secret key in `index.html` or `admin.html`.
@@ -53,7 +57,7 @@ Game: `/`
 
 Admin: `/admin.html`
 
-Admin password: `1928`
+Admin password: use the private value configured in `PIN_TO_WIN_ADMIN_PASSWORD`.
 
 ## How EOI capture works
 

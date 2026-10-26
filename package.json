@@ -1,5 +1,1 @@
-{
-  "name": "pin-to-win-rfds",
-  "private": true,
-  "version": "1.0.0"
-}
+{"name":"pin-to-win-rfds","private":true,"version":"1.1.0","scripts":{"start":"node server.js"}}
