@@ -1,5 +1,5 @@
 /* Conference persistence: every locked pin has a local journal and an idempotent cloud snapshot. */
-const ROUNDS_KEY='rfds_pin_to_win_rounds_v2', CONFIG_KEY='rfds_pin_to_win_config_v2', BOARD_CACHE_KEY='rfds_pin_to_win_board_v2';
+const ROUNDS_KEY='rfds_pin_to_win_rounds_v2', CONFIG_KEY='rfds_pin_to_win_config_v2', BOARD_CACHE_KEY='rfds_pin_to_win_board_all_time_v1';
 function readStored(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
 function writeStored(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch{toast('Device backup could not save. Keep this game open.');return false;}}
 let conference=readStored(CONFIG_KEY,{timezone:'Australia/Adelaide',eventId:'rfds-conference'}),cloudAvailable=false,syncBusy=false;
@@ -46,30 +46,30 @@ async function syncPending(){
 }
 function saveCompletedScore(){persistProgress();}
 function sortRows(rows){return rows.sort((a,b)=>b.score-a.score||(a.total_distance||0)-(b.total_distance||0)||String(a.startedAt||'').localeCompare(String(b.startedAt||''))||String(a.id).localeCompare(String(b.id)));}
-function localBoard(day){
-  const rows=savedRounds().filter(r=>r.completed&&r.day===day&&r.eventId===conference.eventId).map(r=>({id:r.id,name:r.name,score:r.score,total_distance:r.guesses.reduce((sum,g,i)=>sum+haversineKm(g,REMOTE.find(d=>d.id===r.plan[i])),0),source:r.source,pending:!r.synced,local:true,startedAt:r.startedAt,playerKey:r.email?r.email.toLowerCase():r.id}));
+function localBoard(){
+  const rows=savedRounds().filter(r=>r.completed&&r.eventId===conference.eventId).map(r=>({id:r.id,name:r.name,score:r.score,total_distance:r.guesses.reduce((sum,g,i)=>sum+haversineKm(g,REMOTE.find(d=>d.id===r.plan[i])),0),source:r.source,pending:!r.synced,local:true,startedAt:r.startedAt,playerKey:r.email?r.email.toLowerCase():r.id}));
   const best=new Map();for(const row of sortRows(rows))if(!best.has(row.playerKey))best.set(row.playerKey,row);return [...best.values()].slice(0,20);
 }
-function renderBoard(rows,label,day=conferenceDay()){
-  $('board-rows').innerHTML=rows.length?rows.map((r,i)=>`<div class="board-row ${r.id===state.session?.id?'is-you':''}"><div class="rank">${i+1}</div><div class="pilot">${escapeHtml(r.name)}<small>3 flights${r.pending?' · awaiting sync':r.source==='offline'?' · recovered offline':''}${r.id===state.session?.id?' · You':''}</small></div><div class="score">${Number(r.score).toLocaleString()}</div></div>`).join(''):'<p class="board-empty">No completed flights today. Set the first score.</p>';
+function renderBoard(rows,label){
+  $('board-rows').innerHTML=rows.length?rows.map((r,i)=>`<div class="board-row ${r.id===state.session?.id?'is-you':''}"><div class="rank">${i+1}</div><div class="pilot">${escapeHtml(r.name)}<small>3 flights${r.pending?' · awaiting sync':r.source==='offline'?' · recovered offline':''}${r.id===state.session?.id?' · You':''}</small></div><div class="score">${Number(r.score).toLocaleString()}</div></div>`).join(''):'<p class="board-empty">No scores yet. Set the first high score.</p>';
   $('board-sync-status').textContent=label;
-  $('board-event-stat').textContent=`${day} · ${conference.timezone.replace('Australia/','')} time`;
+  $('board-event-stat').textContent='Top 20 · No daily reset';
 }
 let boardLoad=0;
 async function populateBoard(){
-  const request=++boardLoad,day=conferenceDay();
-  const cache=readStored(BOARD_CACHE_KEY,null),cached=cache?.day===day&&cache?.eventId===conference.eventId?cache.rows:[];
-  const local=localBoard(day);renderBoard(cached?.length?cached:local,'Checking today’s cloud leaderboard…');
+  const request=++boardLoad;
+  const cache=readStored(BOARD_CACHE_KEY,null),cached=cache?.scope==='all-time'&&cache?.eventId===conference.eventId?cache.rows:[];
+  const local=localBoard();renderBoard(cached?.length?cached:local,'Checking all-time high scores…');
   await syncPending();
   try{
     const data=await gameRequest('board');if(request!==boardLoad)return;
     conference={timezone:data.timezone,eventId:data.eventId};writeStored(CONFIG_KEY,conference);cloudAvailable=true;
-    writeStored(BOARD_CACHE_KEY,{eventId:data.eventId,day:data.day,rows:data.rows});
-    renderBoard(data.rows,'Daily cloud leaderboard · refreshes automatically',data.day);
-    const pending=localBoard(data.day).filter(r=>r.pending).length;
+    if(data.scope!=='all-time')throw new Error('All-time leaderboard update pending.');
+    writeStored(BOARD_CACHE_KEY,{eventId:data.eventId,scope:data.scope,rows:data.rows});
+    renderBoard(data.rows,'All-time cloud leaderboard · refreshes automatically');
+    const pending=localBoard().filter(r=>r.pending).length;
     if(pending)$('board-sync-status').textContent+=` · ${pending} device score${pending===1?'':'s'} awaiting sync`;
-    if(state.session?.completed&&state.session.day!==data.day)$('board-sync-status').textContent+=` · Your game belongs to ${state.session.day}`;
-  }catch(error){if(request!==boardLoad)return;cloudAvailable=false;renderBoard(cached?.length?cached:localBoard(day),(error.setupRequired?'Cloud setup pending. ':'Offline. ')+(cached?.length?'Showing last synced board. ':'Showing this device’s scores. ')+'New scores stay on this device until synced.');}
+  }catch(error){if(request!==boardLoad)return;cloudAvailable=false;renderBoard(cached?.length?cached:localBoard(),(error.setupRequired?'Cloud setup pending. ':'Offline. ')+(cached?.length?'Showing last synced all-time board. ':'Showing this device’s all-time scores. ')+'New scores stay on this device until synced.');}
 }
 async function retryEois(){for(const entry of readStored(PIN_TO_WIN_EOI_KEY,[]).filter(x=>!x.synced).slice(0,20))if(!await syncEoi(entry))break;}
 function offerResume(){

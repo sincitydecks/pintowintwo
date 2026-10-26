@@ -22,14 +22,14 @@ Existing variables:
 
 Optional conference configuration:
 
-- `PIN_TO_WIN_EVENT_ID` — default `rfds-conference`. Change for a new conference.
+- `PIN_TO_WIN_EVENT_ID` — default `rfds-conference`. Keep this value stable across conferences to preserve the same perpetual leaderboard. Changing it deliberately starts a separate board; prior records remain stored.
 - `PIN_TO_WIN_TIMEZONE` — default `Australia/Adelaide`. Set the conference's timezone explicitly if different, e.g. `Australia/Darwin`.
 
-Daily boards switch at midnight in this timezone. A game belongs to the date it **started**. Prior dates stay archived; no scheduled deletion or reset job is needed.
+The public board shows the top 20 all-time best scores with **no daily reset or automatic expiry**. Scores are saved in Supabase across devices and conferences. Each completed three-flight game is a high-score attempt, not an accumulating points total. Dates and the configured timezone are retained for staff exports and daily archives.
 
 ## Database setup
 
-The existing production Supabase project was configured on 26 October 2026 (migration `20261026024124_pin_to_win_daily_conference_scores`). For another project, apply `supabase/pin_to_win_games.sql` once in its SQL Editor. It adds only the new game table, index, and daily board function. It does not alter or delete EOI records. The script can be safely run again.
+The existing production Supabase project was configured on 26 October 2026 (migration `20261026024124_pin_to_win_daily_conference_scores`). For another project, apply `supabase/pin_to_win_games.sql` once in its SQL Editor. It adds the game table, indexes, and daily/all-time board functions. The perpetual board was added on 26 October 2026 without changing existing scores. It does not alter or delete EOI records. The script can be safely run again.
 
 The existing EOI schema is in `supabase/pin_to_win_eois.sql`. Browser/public database roles cannot read or write either private table. The public leaderboard API returns names and scores, never email addresses, player identifiers or tokens. Staff access requires the configured admin password; there is no built-in default password.
 
@@ -40,7 +40,7 @@ The existing EOI schema is in `supabase/pin_to_win_eois.sql`. Browser/public dat
 - Partial games can be resumed on the same device after refresh or closure.
 - If a game begins offline, it keeps its local plan and original start timestamp. Completed offline games are recalculated on the server and marked `recovered offline` when the connection returns. Recovery accepts starts up to 14 days ago and allows five minutes of clock skew.
 - Unique game IDs and immutable locked guesses prevent retries from duplicating scores. A failed record does not stop other valid queued records from syncing.
-- Blank-email players receive separate guest identities even when names match. An email, if provided, identifies a player's best score within each day using a server-side HMAC identifier.
+- Blank-email players receive separate guest identities even when names match. An email, if provided, identifies a player's best score across all dates using a server-side HMAC identifier.
 - The board refreshes every 20 seconds. It reports cached/device-only data and pending scores explicitly when cloud access fails.
 - In the staff dashboard, choose a date to view/export all games for that day, including partial games. Export the full device journal before clearing browser data.
 
@@ -48,7 +48,7 @@ Local keys:
 
 - `rfds_pin_to_win_rounds_v2`: dated progress, queued submissions and session credentials
 - `rfds_pin_to_win_config_v2`: conference timezone/event settings
-- `rfds_pin_to_win_board_v2`: last synced board
+- `rfds_pin_to_win_board_all_time_v1`: last synced all-time board (separate from the older daily cache)
 - `rfds_pin_to_win_eois`: preserved EOI backup
 - `rfds_demo_board`: preserved legacy undated leaderboard; never cleared or assigned an invented date
 

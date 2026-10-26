@@ -293,7 +293,7 @@ function showFlightResult(d,dist,scoring,priorTotal){
   $('result-destination').innerHTML=`${escapeHtml(d.name)}<span>, ${d.state}</span>`;
   $('route-origin').textContent=state.current.base.name;$('route-dest').textContent=d.name;
   $('result-flight-label').textContent=`Flight ${state.currentIndex+1} of 3`;
-  $('next-btn').textContent=state.currentIndex===2?'See today’s leaderboard':'Next flight →';
+  $('next-btn').textContent=state.currentIndex===2?'See all-time high scores':'Next flight →';
   $('result-feedback').textContent=dist<=25?'Precision pin. Beautiful navigation.':dist<=100?'On course. A well-placed pin.':dist<=250?'Close — keep refining your navigation.':'A little off course. Every flight is a fresh start.';
   $('result-feedback').style.color=accuracyColour(dist);renderResultMap();
   $('result-distance').textContent=`${dist.toFixed(1)} km`;$('accuracy-status').textContent=statusText;

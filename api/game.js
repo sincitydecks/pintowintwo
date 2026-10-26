@@ -6,10 +6,15 @@ module.exports = async function handler(req, res) {
     const action = clean(req.query?.action || (req.method === 'GET' ? 'board' : ''), 20);
     if (req.method === 'GET' && action === 'config') return json(res, 200, { ok: true, ...conf, today });
     if (req.method === 'GET' && action === 'board') {
-      const day = clean(req.query?.day || today, 10);
+      // The public board is perpetual. Explicit dates retain access to daily archives.
+      if (!req.query?.day) {
+        const rows = await db('rpc/pin_to_win_all_time_board', { method: 'POST', body: { event_key: conf.eventId } });
+        return json(res, 200, { ok: true, ...conf, today, scope: 'all-time', rows: rows || [] });
+      }
+      const day = clean(req.query.day, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return json(res, 400, { ok: false, error: 'Invalid conference date.' });
       const rows = await db('rpc/pin_to_win_daily_board', { method: 'POST', body: { event_key: conf.eventId, day_key: day } });
-      return json(res, 200, { ok: true, ...conf, today, day, rows: rows || [] });
+      return json(res, 200, { ok: true, ...conf, today, day, scope: 'daily', rows: rows || [] });
     }
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return json(res, 405, { ok: false, error: 'Method not allowed.' }); }
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

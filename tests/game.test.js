@@ -5,8 +5,8 @@ const game=require('../lib/game'),handler=require('../api/game');const {randomUU
 let records,requests;
 function mockCloud(url,opts={}){
   requests.push({url,opts});const parsed=new URL(url),path=parsed.pathname,body=opts.body?JSON.parse(opts.body):null;
-  if(path.endsWith('/rpc/pin_to_win_daily_board')){
-    const best=new Map();for(const row of [...records.values()].filter(r=>r.event_id===body.event_key&&r.event_day===body.day_key&&r.completed).sort((a,b)=>b.score-a.score||a.total_distance-b.total_distance))if(!best.has(row.player_id))best.set(row.player_id,row);
+  if(path.endsWith('/rpc/pin_to_win_daily_board')||path.endsWith('/rpc/pin_to_win_all_time_board')){
+    const best=new Map();for(const row of [...records.values()].filter(r=>r.event_id===body.event_key&&(!body.day_key||r.event_day===body.day_key)&&r.completed).sort((a,b)=>b.score-a.score||a.total_distance-b.total_distance||a.started_at.localeCompare(b.started_at)||a.id.localeCompare(b.id)))if(!best.has(row.player_id))best.set(row.player_id,row);
     return Promise.resolve(Response.json([...best.values()].slice(0,20).map(r=>({id:r.id,name:r.full_name,score:r.score,total_distance:r.total_distance,source:r.source}))));
   }
   const id=parsed.searchParams.get('id')?.slice(3),revision=parsed.searchParams.get('revision')?.slice(3);
@@ -34,4 +34,17 @@ test('scores are recomputed; each flight is saved, locked guesses cannot change,
 test('forged token is rejected and games cannot be overwritten through recovery',async()=>{const id=randomUUID(),r=await call('start',{id,name:'Pilot'});assert.equal((await call('progress',{id,token:'forged',guesses:[]})).status,401);assert.equal((await call('start',{id,name:'Someone else'})).status,409);const plan=r.data.plan,guesses=plan.map(id=>{const d=require('../data/destinations').find(d=>d.id===id);return {lat:d.lat,lon:d.lon}});assert.equal((await call('recover',{id,name:'Pilot',plan,guesses,startedAt:new Date().toISOString()})).status,409);});
 test('offline recovery retains the original day, recomputes score and accepts exact retries once',async()=>{const plan=game.pickPlan(),startedAt=new Date(Date.now()-86400000).toISOString(),guesses=plan.map(id=>{const d=require('../data/destinations').find(d=>d.id===id);return {lat:d.lat,lon:d.lon}});const payload={id:randomUUID(),name:'Offline Pilot',email:'',plan,guesses,startedAt,score:999999};const first=await call('recover',payload);assert.equal(first.status,200);assert.equal(first.data.day,game.eventDay(new Date(startedAt)));assert.equal(first.data.score,4200);assert.equal((await call('recover',payload)).status,200);assert.equal(records.size,1);assert.equal((await call('recover',{...payload,name:'Different Pilot'})).status,409);});
 test('same names without email remain distinct participants',async()=>{for(let i=0;i<2;i++){const id=randomUUID(),r=await call('start',{id,name:'Alex Smith'});await call('progress',{id,token:r.data.token,guesses:r.data.plan.map(id=>{const d=require('../data/destinations').find(d=>d.id===id);return {lat:d.lat,lon:d.lon}})});}const r=await call('board');assert.equal(r.data.rows.length,2);});
+test('default board spans dates, keeps each player’s best score, and preserves explicit daily archives',async()=>{
+  const fixtures=[
+    {id:'old-best',player_id:'returning',event_day:'2026-10-20',score:4200,total_distance:0},
+    {id:'new-lower',player_id:'returning',event_day:'2026-10-26',score:3000,total_distance:30},
+    {id:'other-guest',player_id:'guest:other',event_day:'2026-10-26',score:3500,total_distance:20},
+    {id:'partial',player_id:'partial',event_day:'2026-10-26',score:1400,total_distance:0,completed:false},
+    {id:'other-event',player_id:'other',event_day:'2026-10-20',score:4200,total_distance:0,event_id:'different-board'}
+  ];
+  for(const row of fixtures)records.set(row.id,{event_id:'test-conference',completed:true,full_name:'Pilot',source:'online',started_at:row.event_day+'T00:00:00Z',...row});
+  const board=await call('board');assert.equal(board.status,200);assert.equal(board.data.scope,'all-time');assert.deepEqual(board.data.rows.map(r=>r.id),['old-best','other-guest']);assert(!('day' in board.data));assert(requests[0].url.endsWith('/rpc/pin_to_win_all_time_board'));
+  const daily=await call('board',null,'GET',{day:'2026-10-26'});assert.equal(daily.data.scope,'daily');assert.deepEqual(daily.data.rows.map(r=>r.id),['other-guest','new-lower']);
+  assert.equal((await call('board',null,'GET',{day:'invalid'})).status,400);
+});
 test('database failure responds explicitly without claiming cloud persistence',async()=>{global.fetch=async()=>Response.json({code:'PGRST205'},{status:404});const r=await call('board');assert.equal(r.status,503);assert.equal(r.data.setupRequired,true);});
