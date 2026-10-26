@@ -18,4 +18,4 @@ A local PostgreSQL-compatible engine verified that the migration applies twice, 
 
 Browser checks covered desktop, iPad, portrait phones down to 320px, landscape phones, the full six-second reveal, the hidden destination, reduced motion, refresh/resume, a complete three-flight offline game, queued sync and an online server-issued plan. No application JavaScript errors were observed.
 
-Production verification depends on applying the migration to the existing Supabase project and deploying the new API routes. The app labels cloud setup failures and retains device progress until this is complete.
+Production verification completed on 26 October 2026: the additive scores migration was applied to the existing Supabase project; the deployed configuration and leaderboard endpoints returned successfully; a live game with blank email saved its first flight and the server calculated 1,400 points. The temporary incomplete verification game was removed without appearing on the public board. Database checks verified daily separation, best-score selection and restricted public access. Daily boundaries currently use Australia/Adelaide.

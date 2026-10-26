@@ -29,7 +29,7 @@ Daily boards switch at midnight in this timezone. A game belongs to the date it 
 
 ## Database setup
 
-Use the existing Supabase project. Apply `supabase/pin_to_win_games.sql` once in its SQL Editor. It adds only the new game table, index, and daily board function. It does not alter or delete EOI records. The script can be safely run again.
+The existing production Supabase project was configured on 26 October 2026 (migration `20261026024124_pin_to_win_daily_conference_scores`). For another project, apply `supabase/pin_to_win_games.sql` once in its SQL Editor. It adds only the new game table, index, and daily board function. It does not alter or delete EOI records. The script can be safely run again.
 
 The existing EOI schema is in `supabase/pin_to_win_eois.sql`. Browser/public database roles cannot read or write either private table. The public leaderboard API returns names and scores, never email addresses, player identifiers or tokens. Staff access requires the configured admin password; there is no built-in default password.
 
