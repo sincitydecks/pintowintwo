@@ -26,14 +26,14 @@ const DESTINATIONS = [
   { id:'bendigo', name:'Bendigo', state:'VIC', section:'VIC_TAS', role:'remote', lat:-36.758, lon:144.280, difficulty:2, base:'Essendon' },
   { id:'mildura', name:'Mildura', state:'VIC', section:'VIC_TAS', role:'remote', lat:-34.185, lon:142.162, difficulty:3, base:'Essendon' }
 ,
-  {"id": "mt-doreen", "name": "Mt Doreen Station", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -22.089, "lon": 131.422, "difficulty": 5, "base": "Port Augusta", "area": "Tanami", "coordinateStatus": "representative"},
-  {"id": "tennant-creek", "name": "Tennant Creek", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -19.6344, "lon": 134.1830, "difficulty": 3, "base": "Port Augusta", "area": "Barkly", "coordinateStatus": "aerodrome"},
-  {"id": "galiwinku", "name": "Galiwinku (Elcho Island)", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.0194, "lon": 135.5710, "difficulty": 5, "base": "Port Augusta", "area": "Elcho Island", "coordinateStatus": "aerodrome"},
-  {"id": "tiwi", "name": "Tiwi", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -11.76494, "lon": 130.61585, "difficulty": 4, "base": "Port Augusta", "area": "Bathurst Island \u00b7 Wurrumiyanga", "coordinateStatus": "aerodrome"},
-  {"id": "borroloola", "name": "Borroloola", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -16.0754, "lon": 136.3028, "difficulty": 4, "base": "Port Augusta", "area": "Gulf country", "coordinateStatus": "aerodrome"},
-  {"id": "maningrida", "name": "Maningrida", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.0561, "lon": 134.2342, "difficulty": 4, "base": "Port Augusta", "area": "Arnhem Land", "coordinateStatus": "aerodrome"},
-  {"id": "gove", "name": "Gove", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.274467, "lon": 136.823902, "difficulty": 3, "base": "Port Augusta", "area": "Gove Airport \u00b7 Nhulunbuy", "coordinateStatus": "aerodrome"},
-  {"id": "ti-tree", "name": "Ti Tree", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -22.12732, "lon": 133.42237, "difficulty": 4, "base": "Port Augusta", "area": "Central Australia", "coordinateStatus": "aerodrome"}
+  {"id": "mt-doreen", "name": "Mt Doreen Station", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -22.089, "lon": 131.422, "difficulty": 5, "base": "Alice Springs", "area": "Tanami", "coordinateStatus": "representative"},
+  {"id": "tennant-creek", "name": "Tennant Creek", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -19.6344, "lon": 134.1830, "difficulty": 3, "base": "Alice Springs", "area": "Barkly", "coordinateStatus": "aerodrome"},
+  {"id": "galiwinku", "name": "Galiwinku (Elcho Island)", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.0194, "lon": 135.5710, "difficulty": 5, "base": "Darwin", "area": "Elcho Island", "coordinateStatus": "aerodrome"},
+  {"id": "tiwi", "name": "Tiwi", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -11.76494, "lon": 130.61585, "difficulty": 4, "base": "Darwin", "area": "Bathurst Island \u00b7 Wurrumiyanga", "coordinateStatus": "aerodrome"},
+  {"id": "borroloola", "name": "Borroloola", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -16.0754, "lon": 136.3028, "difficulty": 4, "base": "Darwin", "area": "Gulf country", "coordinateStatus": "aerodrome"},
+  {"id": "maningrida", "name": "Maningrida", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.0561, "lon": 134.2342, "difficulty": 4, "base": "Darwin", "area": "Arnhem Land", "coordinateStatus": "aerodrome"},
+  {"id": "gove", "name": "Gove", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -12.274467, "lon": 136.823902, "difficulty": 3, "base": "Darwin", "area": "Gove Airport \u00b7 Nhulunbuy", "coordinateStatus": "aerodrome"},
+  {"id": "ti-tree", "name": "Ti Tree", "state": "NT", "section": "SA_NT", "role": "remote", "lat": -22.12732, "lon": 133.42237, "difficulty": 4, "base": "Alice Springs", "area": "Central Australia", "coordinateStatus": "aerodrome"}
 ];
 
 if(typeof module!=="undefined"&&module.exports)module.exports=DESTINATIONS;
