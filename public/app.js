@@ -150,7 +150,7 @@ function pickPlan(){
   const chosen=ordered.flatMap(s=>bySection[s].slice(0,2));
   const p=[...chosen];
   for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]];}
-  return p.slice(0,3).map((d,i)=>{const s=scenarioFor(d);return {id:`mission-${Date.now()}-${i}`,destinationId:d.id,d,base:BASES.find(b=>b.id===({WA:'jandakot',SA_NT:'port-augusta',QLD:'charleville',NSW_SE:'broken-hill',VIC_TAS:'essendon'}[d.section]))||BASES[0],scenario:s};});
+  return p.slice(0,3).map((d,i)=>{const s=scenarioFor(d);return {id:`mission-${Date.now()}-${i}`,destinationId:d.id,d,base:BASES.find(b=>b.id===({WA:'jandakot',SA_NT:'port-augusta','darwin',QLD:'charleville',NSW_SE:'broken-hill',VIC_TAS:'essendon'}[d.section]))||BASES[0],scenario:s};});
 }
 function setSvgCircle(el,lat,lon,svg){
   if(!el||!svg)return;
