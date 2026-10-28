@@ -5,6 +5,8 @@ const DESTINATIONS = [
   { id:'charleville', name:'Charleville', state:'QLD', section:'QLD', role:'base', lat:-26.413, lon:146.263, difficulty:1, base:'Charleville' },
   { id:'broken-hill', name:'Broken Hill', state:'NSW', section:'NSW_SE', role:'base', lat:-31.954, lon:141.454, difficulty:1, base:'Broken Hill' },
   { id:'essendon', name:'Essendon', state:'VIC', section:'VIC_TAS', role:'base', lat:-37.728, lon:144.902, difficulty:1, base:'Essendon' },
+  { id:'darwin', name:'Darwin', state:'NT', section:'SA_NT', role:'base', lat:-12.408, lon:130.872, difficulty:1, base:'Darwin' },
+  { id:'alice-springs', name:'Alice Springs', state:'NT', section:'SA_NT', role:'base', lat:-23.8067, lon:133.9022, difficulty:1, base:'Alice Springs' },
   { id:'marble-bar', name:'Marble Bar', state:'WA', section:'WA', role:'remote', lat:-21.172, lon:119.745, difficulty:4, base:'Jandakot' },
   { id:'nullagine', name:'Nullagine', state:'WA', section:'WA', role:'remote', lat:-21.887, lon:120.110, difficulty:4, base:'Jandakot' },
   { id:'wiluna', name:'Wiluna', state:'WA', section:'WA', role:'remote', lat:-26.594, lon:120.226, difficulty:4, base:'Jandakot' },
