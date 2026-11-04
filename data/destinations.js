@@ -1,4 +1,5 @@
-[
+// Shared game data. Keep this file usable in both the browser and Node.js.
+const DESTINATIONS = [
   {
     "id": "jandakot",
     "name": "Jandakot",
@@ -1115,4 +1116,10 @@
     "difficulty": 4,
     "base": "Essendon"
   }
-]
+];
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = DESTINATIONS;
+} else {
+  window.DESTINATIONS = DESTINATIONS;
+}
