@@ -160,7 +160,8 @@ function pickPlan(){
     scenario: s
   };
 });
-  
+}
+
 function setSvgCircle(el,lat,lon,svg){
   if(!el||!svg)return;
   const p=latLonToSvg(lat,lon);el.setAttribute('cx',p.x);el.setAttribute('cy',p.y);
