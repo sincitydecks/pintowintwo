@@ -1,4 +1,4 @@
-# RFDS Pin to Win — conference edition
+# RFDS Pin to Win — Flight Crew Challenge
 
 Three flights across a shared pool of 28 Australian destinations. A name is required; email is optional. The game links an orange departure node to the briefing panel, then plays a six-second flight and distance reveal after each pin is locked.
 
@@ -53,6 +53,11 @@ Local keys:
 - `rfds_demo_board`: preserved legacy undated leaderboard; never cleared or assigned an invented date
 
 Do not clear site data on the conference iPad while unsynced records remain. A local backup belongs to its browser and site origin; cloud records can be read from any event device.
+
+
+## Restore the all-time leaderboard
+
+If the leaderboard was cleared using the staff dashboard, completed games were archived with `hidden_at` rather than deleted. To put that history back on the public all-time top 20, run `supabase/restore_all_time_leaderboard.sql` once in the Supabase SQL Editor for the existing project. It restores completed records for the existing `rfds-conference` event key across all dates; it does not delete or rewrite game history. Keep `PIN_TO_WIN_EVENT_ID` unset or set to `rfds-conference` so the app continues reading those same records.
 
 ## Local checks
 
